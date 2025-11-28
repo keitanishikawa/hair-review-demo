@@ -1,8 +1,8 @@
 // Demo accounts configuration
 const DEMO_ACCOUNTS = [
-    'ito.jun@example.com',
-    'sato.misaki@example.com',
-    'tanaka.kenta@example.com'
+    'user1@demo.com',
+    'user2@demo.com',
+    'user3@demo.com'
 ];
 
 // DOM elements
@@ -34,7 +34,7 @@ function init() {
     // Demo account click handlers
     demoAccountElements.forEach(element => {
         element.addEventListener('click', () => {
-            const email = element.textContent.split(': ')[1];
+            const email = element.textContent.trim();
             if (email) {
                 emailInput.value = email;
                 emailInput.focus();
@@ -92,20 +92,10 @@ function showSuccessAndRedirect(email) {
     localStorage.setItem('userEmail', email);
     localStorage.setItem('loginTime', new Date().toISOString());
 
-    // Simulate loading and redirect
+    // Redirect to dashboard
     setTimeout(() => {
-        // In a real application, you would redirect to the dashboard
-        // For demo purposes, we'll show a success message
-        alert('ログイン成功！\n\nメールアドレス: ' + email + '\n\n※実際のアプリケーションではダッシュボードにリダイレクトされます。');
-
-        // Reset form
-        emailInput.value = '';
-        loginBtn.disabled = false;
-        loginBtn.innerHTML = '<span class="btn-text">ログイン</span><span class="btn-arrow">→</span>';
-
-        // In a real app, uncomment the following line to redirect:
-        // window.location.href = 'dashboard.html';
-    }, 1500);
+        window.location.href = 'dashboard.html';
+    }, 1000);
 }
 
 // Check if user is already logged in
