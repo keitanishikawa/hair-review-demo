@@ -154,25 +154,39 @@ function updateChart() {
             data = analyzeStylePreferences(reviews);
             labels = ['カジュアル', 'フェミニン', 'エレガント', 'スタイリッシュ'];
             colors = ['#f4a5a5', '#f5c7d4', '#b87ba7', '#8b5a9e'];
+            renderChart(labels, Object.values(data), colors);
             break;
         case 'age':
             data = analyzeAgeGroups(reviews);
             labels = Object.keys(data);
             colors = ['#ff9a8c', '#ffc0a6', '#c494c4', '#9b7bb5', '#6a5f96'];
+            renderChart(labels, Object.values(data), colors);
             break;
         case 'occupation':
             data = analyzeMaritalStatus(reviews);
             labels = Object.keys(data);
             colors = ['#f4a5a5', '#c494c4'];
+            renderChart(labels, Object.values(data), colors);
             break;
         case 'children':
             data = analyzeChildren(reviews);
             labels = Object.keys(data);
             colors = ['#f5c7d4', '#b87ba7'];
+            renderChart(labels, Object.values(data), colors);
+            break;
+        case 'job':
+            data = analyzeJobs(reviews);
+            labels = Object.keys(data);
+            colors = ['#ff9a8c', '#ffc0a6', '#c494c4', '#9b7bb5', '#6a5f96', '#8b7ba7'];
+            renderChart(labels, Object.values(data), colors);
+            break;
+        case 'job-style':
+            renderJobStyleChart(reviews);
+            break;
+        case 'comparison':
+            renderComparisonChart();
             break;
     }
-
-    renderChart(labels, Object.values(data), colors);
 }
 
 // Analyze style preferences from CSV data
@@ -252,6 +266,220 @@ function analyzeChildren(reviews) {
     });
 
     return children;
+}
+
+// Analyze jobs from CSV data
+function analyzeJobs(reviews) {
+    const jobs = {};
+
+    reviews.forEach(review => {
+        const job = review.職業;
+        if (job && job !== '職業') {
+            jobs[job] = (jobs[job] || 0) + 1;
+        }
+    });
+
+    // Sort by count
+    const sortedJobs = Object.fromEntries(
+        Object.entries(jobs).sort(([,a], [,b]) => b - a)
+    );
+
+    return sortedJobs;
+}
+
+// Render job-style cross analysis chart
+function renderJobStyleChart(reviews) {
+    const ctx = document.getElementById('demographicChart');
+
+    // Prepare data for job x style
+    const jobs = ['会社員', 'パート', '主婦', '自営業', '学生', 'アルバイト'];
+    const styles = ['カジュアル', 'フェミニン', 'エレガント', 'スタイリッシュ'];
+
+    const datasets = styles.map((style, index) => {
+        const colors = ['#f4a5a5', '#f5c7d4', '#b87ba7', '#8b5a9e'];
+        const data = jobs.map(job => {
+            return reviews.filter(r => r.職業 === job && r.女性像 === style).length;
+        });
+
+        return {
+            label: style,
+            data: data,
+            backgroundColor: colors[index],
+            borderColor: colors[index],
+            borderWidth: 1
+        };
+    });
+
+    // Destroy existing chart
+    if (currentChart) {
+        currentChart.destroy();
+    }
+
+    // Create stacked bar chart
+    currentChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: jobs,
+            datasets: datasets
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 10,
+                        font: {
+                            size: 11
+                        }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.dataset.label || '';
+                            const value = context.parsed.y || 0;
+                            return `${label}: ${value}人`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    stacked: true,
+                    ticks: {
+                        font: {
+                            size: 10
+                        }
+                    }
+                },
+                y: {
+                    stacked: true,
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Render comparison chart with other stylists
+function renderComparisonChart() {
+    const ctx = document.getElementById('demographicChart');
+
+    // Get all stylists' statistics
+    const stylistStats = stylistsData.map(stylist => {
+        const reviews = reviewsData.filter(r => r.選択した画像ファイル === stylist.アップロード画像ファイル名);
+        return {
+            name: stylist.姓名,
+            reviewCount: reviews.length,
+            styles: analyzeStylePreferences(reviews),
+            avgAge: reviews.length > 0 ? reviews.reduce((sum, r) => sum + parseInt(r.年齢 || 0), 0) / reviews.length : 0
+        };
+    });
+
+    // Calculate average stats
+    const avgReviewCount = stylistStats.reduce((sum, s) => sum + s.reviewCount, 0) / stylistStats.length;
+
+    // Get current stylist stats
+    const currentReviews = getStylistReviews();
+    const currentStats = {
+        reviewCount: currentReviews.length,
+        styles: analyzeStylePreferences(currentReviews),
+        avgAge: currentReviews.length > 0 ? currentReviews.reduce((sum, r) => sum + parseInt(r.年齢 || 0), 0) / currentReviews.length : 0
+    };
+
+    // Prepare radar chart data
+    const labels = ['レビュー数', 'カジュアル', 'フェミニン', 'エレガント', 'スタイリッシュ'];
+
+    // Normalize data for radar chart (0-10 scale)
+    const currentData = [
+        (currentStats.reviewCount / avgReviewCount) * 5, // Normalized review count
+        currentStats.styles['カジュアル'] || 0,
+        currentStats.styles['フェミニン'] || 0,
+        currentStats.styles['エレガント'] || 0,
+        currentStats.styles['スタイリッシュ'] || 0
+    ];
+
+    // Calculate salon average
+    const salonAvgData = labels.map((label, index) => {
+        if (index === 0) return 5; // Average baseline
+        const styleName = label;
+        const total = stylistStats.reduce((sum, s) => sum + (s.styles[styleName] || 0), 0);
+        return total / stylistStats.length;
+    });
+
+    // Destroy existing chart
+    if (currentChart) {
+        currentChart.destroy();
+    }
+
+    // Create radar chart
+    currentChart = new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'あなた',
+                    data: currentData,
+                    backgroundColor: 'rgba(244, 165, 165, 0.2)',
+                    borderColor: '#f4a5a5',
+                    borderWidth: 2,
+                    pointBackgroundColor: '#f4a5a5',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: '#f4a5a5'
+                },
+                {
+                    label: 'サロン平均',
+                    data: salonAvgData,
+                    backgroundColor: 'rgba(155, 123, 181, 0.2)',
+                    borderColor: '#9b7bb5',
+                    borderWidth: 2,
+                    pointBackgroundColor: '#9b7bb5',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: '#9b7bb5'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 15,
+                        font: {
+                            size: 12
+                        }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.dataset.label || '';
+                            const value = context.parsed.r || 0;
+                            return `${label}: ${value.toFixed(1)}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                r: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 2
+                    }
+                }
+            }
+        }
+    });
 }
 
 // Render chart

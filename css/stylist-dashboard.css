@@ -391,17 +391,18 @@
 /* Responsive Design */
 @media (max-width: 768px) {
     .category-tabs {
-        gap: 8px;
+        gap: 6px;
     }
 
     .category-tab {
-        font-size: 13px;
-        padding: 8px 12px;
-        min-width: 60px;
+        font-size: 12px;
+        padding: 8px 10px;
+        min-width: 55px;
+        flex: 0 1 auto;
     }
 
     .chart-container {
-        height: 250px;
+        height: 280px;
     }
 }
 
@@ -415,9 +416,18 @@
         padding: 20px;
     }
 
+    .category-tabs {
+        gap: 5px;
+    }
+
     .category-tab {
-        font-size: 12px;
-        padding: 7px 10px;
-        min-width: 50px;
+        font-size: 11px;
+        padding: 6px 8px;
+        min-width: 45px;
+        flex: 0 1 auto;
+    }
+
+    .chart-container {
+        height: 260px;
     }
 }
