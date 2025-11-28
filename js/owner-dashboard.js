@@ -402,9 +402,12 @@ function displayStaff(stylists) {
         const reviewCount = reviewsData.filter(r => r['選択した画像ファイル'] === imageFile).length;
         const stylistReviews = reviewsData.filter(r => r['選択した画像ファイル'] === imageFile);
 
-        // Calculate average age
+        // Get stylist age
+        const stylistAge = parseInt(stylist['年齢']) || 'N/A';
+
+        // Calculate average customer age
         const ages = stylistReviews.map(r => parseInt(r['年齢'])).filter(a => !isNaN(a));
-        const avgAge = ages.length > 0 ? (ages.reduce((a, b) => a + b, 0) / ages.length).toFixed(1) : 'N/A';
+        const avgCustomerAge = ages.length > 0 ? (ages.reduce((a, b) => a + b, 0) / ages.length).toFixed(1) : 'N/A';
 
         // Find most popular style
         const styles = {};
@@ -420,7 +423,7 @@ function displayStaff(stylists) {
             <div class="staff-card-header">
                 <img src="images/${imageFile}" alt="${stylist['姓名']}" class="staff-avatar">
                 <div class="staff-basic-info">
-                    <h3>${stylist['姓名']}</h3>
+                    <h3>${stylist['姓名']} (${stylistAge}歳)</h3>
                     <p>${stylist['勤務サロン名']}</p>
                 </div>
             </div>
@@ -430,8 +433,8 @@ function displayStaff(stylists) {
                     <span>レビュー</span>
                 </div>
                 <div class="staff-stat">
-                    <strong>${avgAge}</strong>
-                    <span>平均年齢</span>
+                    <strong>${avgCustomerAge}</strong>
+                    <span>顧客平均年齢</span>
                 </div>
                 <div class="staff-stat">
                     <strong>${topStyle}</strong>
@@ -487,13 +490,22 @@ function showStaffModal(stylist) {
     }).sort((a, b) => b - a);
     const rank = allCounts.indexOf(stylistReviews.length) + 1;
 
+    // Get stylist age
+    const stylistAge = parseInt(stylist['年齢']) || 0;
+
+    // Calculate age insights
+    const ageInsights = calculateAgeInsights(stylist, stylistReviews);
+
     // Update modal content
     document.getElementById('modalStaffImage').src = `images/${imageFile}`;
-    document.getElementById('modalStaffName').textContent = stylist['姓名'];
+    document.getElementById('modalStaffName').textContent = `${stylist['姓名']} (${stylistAge}歳)`;
     document.getElementById('modalStaffSalon').textContent = stylist['勤務サロン名'];
     document.getElementById('modalStaffEmail').textContent = stylist['メールアドレス'];
     document.getElementById('modalReviewCount').textContent = stylistReviews.length;
     document.getElementById('modalRank').textContent = `#${rank}`;
+
+    // Display age insights
+    displayAgeInsights(ageInsights);
 
     // Create age chart
     createModalAgeChart(stylistReviews);
@@ -506,6 +518,95 @@ function showStaffModal(stylist) {
 
     // Show modal
     document.getElementById('staffModal').style.display = 'block';
+}
+
+// Calculate age-based insights
+function calculateAgeInsights(stylist, reviews) {
+    const stylistAge = parseInt(stylist['年齢']) || 0;
+    const insights = [];
+
+    if (reviews.length === 0 || stylistAge === 0) {
+        return insights;
+    }
+
+    // Calculate customer age distribution
+    const customerAges = reviews.map(r => parseInt(r['年齢'])).filter(a => !isNaN(a));
+    if (customerAges.length === 0) return insights;
+
+    const avgCustomerAge = customerAges.reduce((a, b) => a + b, 0) / customerAges.length;
+    const ageDiff = avgCustomerAge - stylistAge;
+
+    // Count customers by age groups relative to stylist
+    const sameAge = customerAges.filter(a => Math.abs(a - stylistAge) <= 3).length;
+    const younger = customerAges.filter(a => a < stylistAge - 3).length;
+    const older = customerAges.filter(a => a > stylistAge + 3).length;
+
+    const sameAgePercent = (sameAge / customerAges.length) * 100;
+    const youngerPercent = (younger / customerAges.length) * 100;
+    const olderPercent = (older / customerAges.length) * 100;
+
+    // Generate insights
+    if (olderPercent >= 50) {
+        insights.push(`💡 年齢の割に年上に支持されている (${olderPercent.toFixed(0)}%が年上)`);
+    }
+
+    if (sameAgePercent >= 40) {
+        insights.push(`👥 同年代に人気 (${sameAgePercent.toFixed(0)}%が同年代)`);
+    }
+
+    if (youngerPercent >= 50) {
+        insights.push(`⭐ 若い世代に人気 (${youngerPercent.toFixed(0)}%が年下)`);
+    }
+
+    if (ageDiff >= 5) {
+        insights.push(`📈 平均${ageDiff.toFixed(1)}歳年上の顧客層に支持されている`);
+    } else if (ageDiff <= -5) {
+        insights.push(`📉 平均${Math.abs(ageDiff).toFixed(1)}歳年下の顧客層に支持されている`);
+    } else {
+        insights.push(`🎯 幅広い年齢層から支持されている`);
+    }
+
+    // Age diversity
+    const ageGroups = {
+        '20代前半': customerAges.filter(a => a >= 20 && a <= 24).length,
+        '20代後半': customerAges.filter(a => a >= 25 && a <= 29).length,
+        '30代前半': customerAges.filter(a => a >= 30 && a <= 34).length,
+        '30代後半': customerAges.filter(a => a >= 35 && a <= 39).length,
+        '40代': customerAges.filter(a => a >= 40 && a <= 49).length
+    };
+
+    const nonZeroGroups = Object.values(ageGroups).filter(v => v > 0).length;
+    if (nonZeroGroups >= 4) {
+        insights.push(`🌟 幅広い年齢層から支持を獲得 (${nonZeroGroups}つの年齢層)`);
+    }
+
+    return insights;
+}
+
+// Display age insights
+function displayAgeInsights(insights) {
+    // Find or create insights container
+    let insightsContainer = document.getElementById('ageInsightsContainer');
+
+    if (!insightsContainer) {
+        // Create container if it doesn't exist
+        const modalStats = document.querySelector('.modal-stats');
+        insightsContainer = document.createElement('div');
+        insightsContainer.id = 'ageInsightsContainer';
+        insightsContainer.style.cssText = 'margin: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;';
+        modalStats.insertAdjacentElement('afterend', insightsContainer);
+    }
+
+    if (insights.length === 0) {
+        insightsContainer.style.display = 'none';
+        return;
+    }
+
+    insightsContainer.style.display = 'block';
+    insightsContainer.innerHTML = `
+        <h4 style="margin: 0 0 0.75rem 0; color: #333; font-size: 1rem;">年齢層分析インサイト</h4>
+        ${insights.map(insight => `<div style="padding: 0.5rem 0; color: #555; font-size: 0.9rem;">${insight}</div>`).join('')}
+    `;
 }
 
 // Create modal age chart
@@ -709,10 +810,10 @@ function createComparisonRadarChart(stylists) {
         const styleVariety = Object.keys(styles).length;
 
         const colors = [
-            'rgba(102, 126, 234, 0.6)',
-            'rgba(118, 75, 162, 0.6)',
-            'rgba(237, 100, 166, 0.6)',
-            'rgba(255, 154, 158, 0.6)'
+            'rgba(102, 126, 234, 1)',
+            'rgba(118, 75, 162, 1)',
+            'rgba(237, 100, 166, 1)',
+            'rgba(255, 154, 158, 1)'
         ];
 
         return {
@@ -724,9 +825,13 @@ function createComparisonRadarChart(stylists) {
                 withChildren,
                 styleVariety * 10
             ],
-            backgroundColor: colors[index],
-            borderColor: colors[index].replace('0.6', '1'),
-            borderWidth: 2
+            backgroundColor: 'rgba(0, 0, 0, 0)',  // Transparent fill
+            borderColor: colors[index],
+            borderWidth: 3,
+            pointBackgroundColor: colors[index],
+            pointBorderColor: '#fff',
+            pointRadius: 4,
+            pointHoverRadius: 6
         };
     });
 
@@ -744,12 +849,23 @@ function createComparisonRadarChart(stylists) {
             maintainAspectRatio: true,
             plugins: {
                 legend: {
-                    position: 'bottom'
+                    position: 'bottom',
+                    display: true,
+                    labels: {
+                        font: {
+                            size: 12
+                        },
+                        padding: 15,
+                        usePointStyle: true
+                    }
                 }
             },
             scales: {
                 r: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 5
+                    }
                 }
             }
         }
@@ -765,8 +881,23 @@ function createComparisonDetails(stylists) {
         const imageFile = stylist['アップロード画像ファイル名'];
         const reviews = reviewsData.filter(r => r['選択した画像ファイル'] === imageFile);
 
-        const ages = reviews.map(r => parseInt(r['年齢'])).filter(a => !isNaN(a));
-        const avgAge = ages.length > 0 ? (ages.reduce((a, b) => a + b, 0) / ages.length).toFixed(1) : 'N/A';
+        // Get stylist age
+        const stylistAge = parseInt(stylist['年齢']) || 'N/A';
+
+        // Calculate average customer age
+        const customerAges = reviews.map(r => parseInt(r['年齢'])).filter(a => !isNaN(a));
+        const avgCustomerAge = customerAges.length > 0 ? (customerAges.reduce((a, b) => a + b, 0) / customerAges.length).toFixed(1) : 'N/A';
+
+        // Calculate age difference
+        let ageDiffText = 'N/A';
+        if (stylistAge !== 'N/A' && avgCustomerAge !== 'N/A') {
+            const diff = parseFloat(avgCustomerAge) - stylistAge;
+            if (diff > 0) {
+                ageDiffText = `+${diff.toFixed(1)}歳`;
+            } else {
+                ageDiffText = `${diff.toFixed(1)}歳`;
+            }
+        }
 
         const married = reviews.filter(r => r['既婚未婚'] === '既婚').length;
         const withChildren = reviews.filter(r => r['子供の有無'] === 'あり').length;
@@ -788,14 +919,18 @@ function createComparisonDetails(stylists) {
         const card = document.createElement('div');
         card.className = 'comparison-card';
         card.innerHTML = `
-            <h4>${stylist['姓名']}</h4>
+            <h4>${stylist['姓名']} (${stylistAge}歳)</h4>
             <div class="comparison-metric">
                 <span>レビュー数</span>
                 <span>${reviews.length}</span>
             </div>
             <div class="comparison-metric">
-                <span>平均年齢</span>
-                <span>${avgAge}歳</span>
+                <span>顧客平均年齢</span>
+                <span>${avgCustomerAge}歳</span>
+            </div>
+            <div class="comparison-metric">
+                <span>年齢差</span>
+                <span>${ageDiffText}</span>
             </div>
             <div class="comparison-metric">
                 <span>既婚者</span>
@@ -1257,15 +1392,15 @@ function displayHighlightList(containerId, items) {
 
 // Handle password change
 function handlePasswordChange() {
-    // Step 1: Verify "love word" (takara1234)
-    const loveWord = prompt('パスワードを変更するには「愛言葉」を入力してください:');
+    // Step 1: Verify "secret phrase" (takara1234)
+    const secretPhrase = prompt('パスワードを変更するには「合言葉」を入力してください:');
 
-    if (loveWord === null) {
+    if (secretPhrase === null) {
         return; // User cancelled
     }
 
-    if (loveWord !== 'takara1234') {
-        alert('愛言葉が正しくありません。パスワード変更できませんでした。');
+    if (secretPhrase !== 'takara1234') {
+        alert('合言葉が正しくありません。パスワード変更できませんでした。');
         return;
     }
 
