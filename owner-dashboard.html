@@ -27,6 +27,7 @@
         <button class="nav-tab" data-tab="comparison">📈 比較分析</button>
         <button class="nav-tab" data-tab="demographics">👤 顧客層分析</button>
         <button class="nav-tab" data-tab="highlights">⭐ ハイライト</button>
+        <button class="nav-tab" data-tab="settings">⚙️ 設定</button>
     </nav>
 
     <main class="dashboard-main">
@@ -159,11 +160,6 @@
                     <h3>🏆 トップパフォーマー</h3>
                     <div id="topPerformers" class="highlight-list"></div>
                 </div>
-                <div class="highlight-card">
-                    <h3>📈 成長株</h3>
-                    <p class="highlight-desc">最近レビューが増えているスタッフ</p>
-                    <div id="risingStars" class="highlight-list"></div>
-                </div>
             </div>
 
             <div class="highlights-section">
@@ -211,6 +207,36 @@
                             <div id="popularStylish" class="highlight-list"></div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Settings Tab -->
+        <section id="settings-tab" class="tab-content">
+            <div class="settings-container">
+                <h2>⚙️ 設定</h2>
+
+                <div class="settings-card">
+                    <h3>🔐 パスワード管理</h3>
+                    <p class="settings-desc">オーナー・教育者用のパスワードを変更できます。変更には「愛言葉」が必要です。</p>
+
+                    <div class="settings-form">
+                        <div class="form-group">
+                            <label>現在のパスワード:</label>
+                            <div id="currentPasswordDisplay" style="padding: 0.5rem; background: #f0f0f0; border-radius: 4px; font-family: monospace;">
+                                ••••••••
+                            </div>
+                        </div>
+
+                        <button id="changePasswordBtn" class="primary-btn">パスワードを変更</button>
+                    </div>
+                </div>
+
+                <div class="settings-card">
+                    <h3>ℹ️ システム情報</h3>
+                    <p>データベースを使用せず、ブラウザのローカルストレージで管理しています。</p>
+                    <p style="margin-top: 0.5rem; color: #666;">初期パスワード: lebel1234</p>
+                    <p style="margin-top: 0.5rem; color: #666;">愛言葉: takara1234</p>
                 </div>
             </div>
         </section>

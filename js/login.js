@@ -49,9 +49,7 @@ async function init() {
     // Owner dashboard button click handler
     const ownerDashboardBtn = document.getElementById('ownerDashboardBtn');
     if (ownerDashboardBtn) {
-        ownerDashboardBtn.addEventListener('click', () => {
-            window.location.href = 'owner-dashboard.html';
-        });
+        ownerDashboardBtn.addEventListener('click', handleOwnerLogin);
     }
 }
 
@@ -129,6 +127,35 @@ function checkExistingLogin() {
             localStorage.removeItem('userEmail');
             localStorage.removeItem('loginTime');
         }
+    }
+}
+
+// Handle owner login with password
+function handleOwnerLogin() {
+    // Get current owner password from localStorage (default: lebel1234)
+    const ownerPassword = localStorage.getItem('ownerPassword') || 'lebel1234';
+
+    // Initialize default password if not set
+    if (!localStorage.getItem('ownerPassword')) {
+        localStorage.setItem('ownerPassword', 'lebel1234');
+    }
+
+    // Prompt for password
+    const enteredPassword = prompt('オーナー・教育者用パスワードを入力してください:');
+
+    // Check if user cancelled
+    if (enteredPassword === null) {
+        return;
+    }
+
+    // Validate password
+    if (enteredPassword === ownerPassword) {
+        // Password correct - mark as authenticated and redirect
+        sessionStorage.setItem('ownerAuthenticated', 'true');
+        sessionStorage.setItem('ownerAuthTime', new Date().toISOString());
+        window.location.href = 'owner-dashboard.html';
+    } else {
+        alert('パスワードが正しくありません。');
     }
 }
 

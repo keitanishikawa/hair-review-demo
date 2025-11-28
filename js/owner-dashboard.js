@@ -5,8 +5,40 @@ let stylistsData = [];
 let reviewsData = [];
 let currentCharts = {};
 
+// Check authentication before loading dashboard
+function checkAuthentication() {
+    const isAuthenticated = sessionStorage.getItem('ownerAuthenticated');
+    const authTime = sessionStorage.getItem('ownerAuthTime');
+
+    if (!isAuthenticated || !authTime) {
+        alert('アクセスが拒否されました。ログインページからパスワードを入力してください。');
+        window.location.href = 'index.html';
+        return false;
+    }
+
+    // Check if authentication is expired (24 hours)
+    const authDate = new Date(authTime);
+    const now = new Date();
+    const hoursSinceAuth = (now - authDate) / (1000 * 60 * 60);
+
+    if (hoursSinceAuth >= 24) {
+        alert('認証が期限切れです。再度ログインしてください。');
+        sessionStorage.removeItem('ownerAuthenticated');
+        sessionStorage.removeItem('ownerAuthTime');
+        window.location.href = 'index.html';
+        return false;
+    }
+
+    return true;
+}
+
 // Initialize dashboard when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
+    // Check authentication first
+    if (!checkAuthentication()) {
+        return;
+    }
+
     initializeDashboard();
 });
 
@@ -62,6 +94,23 @@ async function loadData() {
     }
 }
 
+// Helper function to calculate stylist layer based on review count
+function getStylistLayer(stylist) {
+    const imageFile = stylist['アップロード画像ファイル名'];
+    const reviewCount = reviewsData.filter(r => r['選択した画像ファイル'] === imageFile).length;
+
+    if (reviewCount >= 30) return 1;  // Layer 1: 30+ reviews
+    if (reviewCount >= 20) return 2;  // Layer 2: 20-29 reviews
+    if (reviewCount >= 10) return 3;  // Layer 3: 10-19 reviews
+    return 4;  // Layer 4: <10 reviews
+}
+
+// Helper function to get review count for a stylist
+function getReviewCount(stylist) {
+    const imageFile = stylist['アップロード画像ファイル名'];
+    return reviewsData.filter(r => r['選択した画像ファイル'] === imageFile).length;
+}
+
 // Setup event listeners
 function setupEventListeners() {
     // Tab navigation
@@ -75,8 +124,8 @@ function setupEventListeners() {
     // Logout button
     document.getElementById('logoutBtn').addEventListener('click', function() {
         if (confirm('ログアウトしますか？')) {
-            localStorage.removeItem('userEmail');
-            localStorage.removeItem('loginTime');
+            sessionStorage.removeItem('ownerAuthenticated');
+            sessionStorage.removeItem('ownerAuthTime');
             window.location.href = 'index.html';
         }
     });
@@ -103,6 +152,12 @@ function setupEventListeners() {
             modal.style.display = 'none';
         }
     });
+
+    // Password change button
+    const changePasswordBtn = document.getElementById('changePasswordBtn');
+    if (changePasswordBtn) {
+        changePasswordBtn.addEventListener('click', handlePasswordChange);
+    }
 }
 
 // Switch between tabs
@@ -577,15 +632,26 @@ function initializeComparisonTab() {
     const selectorsContainer = document.getElementById('staffSelectors');
     selectorsContainer.innerHTML = '';
 
+    // Filter stylists by layer (only show layer 1 and 2)
+    const topLayerStylists = stylistsData.filter(stylist => {
+        const layer = getStylistLayer(stylist);
+        return layer <= 2;  // Only layer 1 and 2 (top performers)
+    });
+
+    // Sort by review count (descending)
+    topLayerStylists.sort((a, b) => getReviewCount(b) - getReviewCount(a));
+
     for (let i = 1; i <= 4; i++) {
         const select = document.createElement('select');
         select.id = `comparisonSelect${i}`;
         select.innerHTML = '<option value="">選択してください</option>';
 
-        stylistsData.forEach(stylist => {
+        topLayerStylists.forEach(stylist => {
             const option = document.createElement('option');
             option.value = stylist['アップロード画像ファイル名'];
-            option.textContent = stylist['姓名'];
+            const reviewCount = getReviewCount(stylist);
+            const layer = getStylistLayer(stylist);
+            option.textContent = `${stylist['姓名']} (${reviewCount}件・レイヤー${layer})`;
             select.appendChild(option);
         });
 
@@ -1027,7 +1093,6 @@ function createJobStyleCrossChart(reviews) {
 // Initialize Highlights Tab
 function initializeHighlightsTab() {
     createTopPerformers();
-    createRisingStars();
     createPopularWith20s();
     createPopularWith30s();
     createPopularWithWorking();
@@ -1066,12 +1131,6 @@ function createTopPerformers() {
         `;
         container.appendChild(div);
     });
-}
-
-// Create rising stars (placeholder - would need timestamp data)
-function createRisingStars() {
-    const container = document.getElementById('risingStars');
-    container.innerHTML = '<p style="color: #666; text-align: center; padding: 1rem;">時系列データが必要です</p>';
 }
 
 // Create popular with 20s
@@ -1194,4 +1253,47 @@ function displayHighlightList(containerId, items) {
     if (container.children.length === 0) {
         container.innerHTML = '<p style="color: #666; text-align: center; padding: 0.5rem; font-size: 0.85rem;">データなし</p>';
     }
+}
+
+// Handle password change
+function handlePasswordChange() {
+    // Step 1: Verify "love word" (takara1234)
+    const loveWord = prompt('パスワードを変更するには「愛言葉」を入力してください:');
+
+    if (loveWord === null) {
+        return; // User cancelled
+    }
+
+    if (loveWord !== 'takara1234') {
+        alert('愛言葉が正しくありません。パスワード変更できませんでした。');
+        return;
+    }
+
+    // Step 2: Enter new password
+    const newPassword = prompt('新しいパスワードを入力してください:');
+
+    if (newPassword === null || newPassword.trim() === '') {
+        alert('パスワード変更がキャンセルされました。');
+        return;
+    }
+
+    // Step 3: Confirm new password
+    const confirmPassword = prompt('新しいパスワードをもう一度入力してください:');
+
+    if (confirmPassword === null) {
+        alert('パスワード変更がキャンセルされました。');
+        return;
+    }
+
+    if (newPassword !== confirmPassword) {
+        alert('パスワードが一致しません。もう一度お試しください。');
+        return;
+    }
+
+    // Step 4: Save new password to localStorage
+    localStorage.setItem('ownerPassword', newPassword);
+    alert('パスワードが正常に変更されました。\n新しいパスワード: ' + newPassword);
+
+    // Update display (still show masked)
+    document.getElementById('currentPasswordDisplay').textContent = '••••••••';
 }
