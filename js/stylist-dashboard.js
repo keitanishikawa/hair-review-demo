@@ -96,8 +96,6 @@ function handleNavigation(page) {
     } else if (page === 'reviews') {
         document.querySelector('.tabs-section').style.display = 'none';
         document.querySelector('.reviews-section').style.display = 'block';
-    } else if (page === 'popular') {
-        alert('人気作品機能は準備中です');
     }
 }
 
