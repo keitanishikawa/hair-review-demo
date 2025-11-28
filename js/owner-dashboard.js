@@ -733,26 +733,21 @@ function initializeComparisonTab() {
     const selectorsContainer = document.getElementById('staffSelectors');
     selectorsContainer.innerHTML = '';
 
-    // Filter stylists by layer (only show layer 1 and 2)
-    const topLayerStylists = stylistsData.filter(stylist => {
-        const layer = getStylistLayer(stylist);
-        return layer <= 2;  // Only layer 1 and 2 (top performers)
-    });
-
-    // Sort by review count (descending)
-    topLayerStylists.sort((a, b) => getReviewCount(b) - getReviewCount(a));
+    // Get all stylists and sort by review count (descending)
+    const sortedStylists = [...stylistsData].sort((a, b) => getReviewCount(b) - getReviewCount(a));
 
     for (let i = 1; i <= 4; i++) {
         const select = document.createElement('select');
         select.id = `comparisonSelect${i}`;
         select.innerHTML = '<option value="">選択してください</option>';
 
-        topLayerStylists.forEach(stylist => {
+        sortedStylists.forEach(stylist => {
             const option = document.createElement('option');
             option.value = stylist['アップロード画像ファイル名'];
             const reviewCount = getReviewCount(stylist);
-            const layer = getStylistLayer(stylist);
-            option.textContent = `${stylist['姓名']} (${reviewCount}件・レイヤー${layer})`;
+            const stylistAge = parseInt(stylist['年齢']) || '';
+            const ageText = stylistAge ? ` ${stylistAge}歳` : '';
+            option.textContent = `${stylist['姓名']}${ageText} (${reviewCount}件)`;
             select.appendChild(option);
         });
 
