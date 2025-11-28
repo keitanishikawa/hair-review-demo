@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>オーナーダッシュボード - Hair Design Review System</title>
+    <link rel="stylesheet" href="css/owner-dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="dashboard-header">
+        <div class="header-content">
+            <h1>🏢 オーナーダッシュボード</h1>
+            <div class="header-actions">
+                <span id="ownerName">オーナー様</span>
+                <button id="logoutBtn" class="logout-btn">ログアウト</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs">
+        <button class="nav-tab active" data-tab="overview">📊 概要</button>
+        <button class="nav-tab" data-tab="staff">👥 スタッフ一覧</button>
+        <button class="nav-tab" data-tab="comparison">📈 比較分析</button>
+        <button class="nav-tab" data-tab="demographics">👤 顧客層分析</button>
+        <button class="nav-tab" data-tab="highlights">⭐ ハイライト</button>
+    </nav>
+
+    <main class="dashboard-main">
+        <!-- Overview Tab -->
+        <section id="overview-tab" class="tab-content active">
+            <div class="overview-stats">
+                <div class="stat-card">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-info">
+                        <h3 id="totalStylists">0</h3>
+                        <p>総スタッフ数</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">💬</div>
+                    <div class="stat-info">
+                        <h3 id="totalReviews">0</h3>
+                        <p>総レビュー数</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">⭐</div>
+                    <div class="stat-info">
+                        <h3 id="avgReviewsPerStylist">0</h3>
+                        <p>平均レビュー数/人</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🎨</div>
+                    <div class="stat-info">
+                        <h3 id="totalSalons">0</h3>
+                        <p>関連サロン数</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="overview-charts">
+                <div class="chart-container">
+                    <h3>スタッフ別レビュー数トップ10</h3>
+                    <canvas id="topStaffChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>サロン別スタッフ分布</h3>
+                    <canvas id="salonDistributionChart"></canvas>
+                </div>
+            </div>
+
+            <div class="overview-charts">
+                <div class="chart-container">
+                    <h3>全体の顧客層分布</h3>
+                    <canvas id="overallDemographicsChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>女性像の人気分布</h3>
+                    <canvas id="stylePreferencesChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Staff List Tab -->
+        <section id="staff-tab" class="tab-content">
+            <div class="staff-controls">
+                <input type="text" id="staffSearchInput" placeholder="🔍 スタッフ名またはサロン名で検索...">
+                <select id="salonFilter">
+                    <option value="">すべてのサロン</option>
+                </select>
+                <select id="sortBy">
+                    <option value="name">名前順</option>
+                    <option value="reviews-desc">レビュー数（多い順）</option>
+                    <option value="reviews-asc">レビュー数（少ない順）</option>
+                </select>
+            </div>
+            <div id="staffGrid" class="staff-grid"></div>
+        </section>
+
+        <!-- Comparison Tab -->
+        <section id="comparison-tab" class="tab-content">
+            <div class="comparison-controls">
+                <h3>スタッフを選択して比較（最大4人）</h3>
+                <div id="staffSelectors" class="staff-selectors"></div>
+                <button id="compareBtn" class="primary-btn">比較する</button>
+            </div>
+            <div id="comparisonResults" class="comparison-results">
+                <div class="chart-container full-width">
+                    <h3>総合比較</h3>
+                    <canvas id="comparisonRadarChart"></canvas>
+                </div>
+                <div class="comparison-details" id="comparisonDetails"></div>
+            </div>
+        </section>
+
+        <!-- Demographics Tab -->
+        <section id="demographics-tab" class="tab-content">
+            <div class="demographics-controls">
+                <label>
+                    スタッフを選択:
+                    <select id="demographicsStylistSelect">
+                        <option value="all">全体</option>
+                    </select>
+                </label>
+            </div>
+            <div class="demographics-charts">
+                <div class="chart-container">
+                    <h3>年齢層分布</h3>
+                    <canvas id="ageDistributionChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>職業分布</h3>
+                    <canvas id="jobDistributionChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>既婚/未婚分布</h3>
+                    <canvas id="maritalStatusChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>子供の有無</h3>
+                    <canvas id="childrenChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-container full-width">
+                <h3>職業 × 女性像 クロス分析</h3>
+                <canvas id="jobStyleCrossChart"></canvas>
+            </div>
+        </section>
+
+        <!-- Highlights Tab -->
+        <section id="highlights-tab" class="tab-content">
+            <div class="highlights-section">
+                <div class="highlight-card">
+                    <h3>🏆 トップパフォーマー</h3>
+                    <div id="topPerformers" class="highlight-list"></div>
+                </div>
+                <div class="highlight-card">
+                    <h3>📈 成長株</h3>
+                    <p class="highlight-desc">最近レビューが増えているスタッフ</p>
+                    <div id="risingStars" class="highlight-list"></div>
+                </div>
+            </div>
+
+            <div class="highlights-section">
+                <div class="highlight-card">
+                    <h3>👩 20代に人気</h3>
+                    <div id="popularWith20s" class="highlight-list"></div>
+                </div>
+                <div class="highlight-card">
+                    <h3>👩‍💼 30代に人気</h3>
+                    <div id="popularWith30s" class="highlight-list"></div>
+                </div>
+            </div>
+
+            <div class="highlights-section">
+                <div class="highlight-card">
+                    <h3>💼 働く女性に人気</h3>
+                    <p class="highlight-desc">会社員・自営業からの評価が高い</p>
+                    <div id="popularWithWorking" class="highlight-list"></div>
+                </div>
+                <div class="highlight-card">
+                    <h3>👨‍👩‍👧 ママ世代に人気</h3>
+                    <p class="highlight-desc">子供ありの顧客からの評価が高い</p>
+                    <div id="popularWithMoms" class="highlight-list"></div>
+                </div>
+            </div>
+
+            <div class="highlights-section">
+                <div class="highlight-card full-width">
+                    <h3>🎨 女性像別人気スタッフ</h3>
+                    <div class="style-popular-grid">
+                        <div class="style-popular-section">
+                            <h4>カジュアル</h4>
+                            <div id="popularCasual" class="highlight-list"></div>
+                        </div>
+                        <div class="style-popular-section">
+                            <h4>フェミニン</h4>
+                            <div id="popularFeminine" class="highlight-list"></div>
+                        </div>
+                        <div class="style-popular-section">
+                            <h4>エレガント</h4>
+                            <div id="popularElegant" class="highlight-list"></div>
+                        </div>
+                        <div class="style-popular-section">
+                            <h4>スタイリッシュ</h4>
+                            <div id="popularStylish" class="highlight-list"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Staff Detail Modal -->
+    <div id="staffModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div class="modal-header">
+                <img id="modalStaffImage" src="" alt="">
+                <div class="modal-staff-info">
+                    <h2 id="modalStaffName"></h2>
+                    <p id="modalStaffSalon"></p>
+                    <p id="modalStaffEmail"></p>
+                </div>
+            </div>
+            <div class="modal-stats">
+                <div class="modal-stat">
+                    <h4 id="modalReviewCount">0</h4>
+                    <p>レビュー数</p>
+                </div>
+                <div class="modal-stat">
+                    <h4 id="modalRank">-</h4>
+                    <p>ランキング</p>
+                </div>
+            </div>
+            <div class="modal-charts">
+                <div class="chart-container">
+                    <h3>顧客層の年齢分布</h3>
+                    <canvas id="modalAgeChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>女性像の分布</h3>
+                    <canvas id="modalStyleChart"></canvas>
+                </div>
+            </div>
+            <div class="modal-reviews">
+                <h3>最近のレビュー</h3>
+                <div id="modalReviewsList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/owner-dashboard.js"></script>
+</body>
+</html>

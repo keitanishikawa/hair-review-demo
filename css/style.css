@@ -222,6 +222,33 @@ body {
     transform: translateX(5px);
 }
 
+/* Secondary Button for Owner Dashboard */
+.btn-secondary {
+    width: 100%;
+    padding: 14px 30px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 15px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.8);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(255, 255, 255, 0.2);
+}
+
+.btn-secondary:active {
+    transform: translateY(0);
+    box-shadow: 0 5px 20px rgba(255, 255, 255, 0.15);
+}
+
 /* Error Message */
 .error-message {
     color: #e53e3e;

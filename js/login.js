@@ -45,6 +45,14 @@ async function init() {
     emailInput.addEventListener('input', () => {
         hideError();
     });
+
+    // Owner dashboard button click handler
+    const ownerDashboardBtn = document.getElementById('ownerDashboardBtn');
+    if (ownerDashboardBtn) {
+        ownerDashboardBtn.addEventListener('click', () => {
+            window.location.href = 'owner-dashboard.html';
+        });
+    }
 }
 
 // Handle login
