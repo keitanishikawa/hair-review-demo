@@ -327,13 +327,16 @@ function renderJobStyleChart(reviews) {
                 legend: {
                     position: 'bottom',
                     labels: {
-                        padding: 10,
+                        padding: 15,
                         font: {
-                            size: 11
+                            size: 13
                         }
                     }
                 },
                 tooltip: {
+                    bodyFont: {
+                        size: 14
+                    },
                     callbacks: {
                         label: function(context) {
                             const label = context.dataset.label || '';
@@ -348,7 +351,7 @@ function renderJobStyleChart(reviews) {
                     stacked: true,
                     ticks: {
                         font: {
-                            size: 10
+                            size: 12
                         }
                     }
                 },
@@ -356,6 +359,9 @@ function renderJobStyleChart(reviews) {
                     stacked: true,
                     beginAtZero: true,
                     ticks: {
+                        font: {
+                            size: 12
+                        },
                         stepSize: 1
                     }
                 }
@@ -452,13 +458,16 @@ function renderComparisonChart() {
                 legend: {
                     position: 'bottom',
                     labels: {
-                        padding: 15,
+                        padding: 20,
                         font: {
-                            size: 12
+                            size: 14
                         }
                     }
                 },
                 tooltip: {
+                    bodyFont: {
+                        size: 14
+                    },
                     callbacks: {
                         label: function(context) {
                             const label = context.dataset.label || '';
@@ -471,7 +480,15 @@ function renderComparisonChart() {
             scales: {
                 r: {
                     beginAtZero: true,
+                    pointLabels: {
+                        font: {
+                            size: 13
+                        }
+                    },
                     ticks: {
+                        font: {
+                            size: 12
+                        },
                         stepSize: 2
                     }
                 }
@@ -508,13 +525,16 @@ function renderChart(labels, data, colors) {
                 legend: {
                     position: 'bottom',
                     labels: {
-                        padding: 15,
+                        padding: 20,
                         font: {
-                            size: 12
+                            size: 14
                         }
                     }
                 },
                 tooltip: {
+                    bodyFont: {
+                        size: 14
+                    },
                     callbacks: {
                         label: function(context) {
                             const label = context.label || '';

@@ -9,7 +9,7 @@
 /* Header with Gradient */
 .dashboard-header {
     position: relative;
-    padding: 60px 20px 40px;
+    padding: 40px 20px 30px;
     background: linear-gradient(135deg, #e794d5 0%, #c77dd1 25%, #9b6cc7 50%, #7b5fb8 75%, #6a4fa9 100%);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
@@ -65,12 +65,12 @@
 /* Main Content */
 .dashboard-main {
     padding: 20px;
-    max-width: 600px;
+    max-width: 100%;
     margin: 0 auto;
 }
 
 .section-heading {
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 700;
     color: #333;
     margin-bottom: 20px;
@@ -94,12 +94,12 @@
 
 .category-tab {
     flex: 1;
-    min-width: 70px;
-    padding: 10px 15px;
+    min-width: 80px;
+    padding: 12px 16px;
     background: #f5f5f5;
     border: none;
     border-radius: 8px;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
     color: #666;
     cursor: pointer;
@@ -119,7 +119,7 @@
 /* Chart Container */
 .chart-container {
     position: relative;
-    height: 300px;
+    height: 400px;
     margin-bottom: 20px;
     display: flex;
     align-items: center;
@@ -195,7 +195,7 @@
 }
 
 .review-comment {
-    font-size: 14px;
+    font-size: 15px;
     line-height: 1.6;
     color: #333;
 }
@@ -411,23 +411,23 @@
 /* Responsive Design */
 @media (max-width: 768px) {
     .category-tabs {
-        gap: 6px;
+        gap: 8px;
     }
 
     .category-tab {
-        font-size: 12px;
-        padding: 8px 10px;
-        min-width: 55px;
+        font-size: 14px;
+        padding: 10px 12px;
+        min-width: 65px;
         flex: 0 1 auto;
     }
 
     .chart-container {
-        height: 280px;
+        height: 350px;
     }
 
     .nav-icon-img {
-        width: 22px;
-        height: 22px;
+        width: 24px;
+        height: 24px;
     }
 }
 
@@ -442,39 +442,39 @@
     }
 
     .category-tabs {
-        gap: 5px;
+        gap: 6px;
     }
 
     .category-tab {
-        font-size: 11px;
-        padding: 6px 8px;
-        min-width: 45px;
+        font-size: 13px;
+        padding: 8px 10px;
+        min-width: 60px;
         flex: 0 1 auto;
     }
 
     .chart-container {
-        height: 260px;
+        height: 320px;
     }
 
     .section-heading {
-        font-size: 16px;
+        font-size: 18px;
     }
 
     .nav-icon-img {
-        width: 20px;
-        height: 20px;
+        width: 22px;
+        height: 22px;
     }
 
     .nav-label {
-        font-size: 10px;
+        font-size: 11px;
     }
 
     .stylist-name {
-        font-size: 20px;
+        font-size: 22px;
     }
 
     .profile-image-wrapper {
-        width: 70px;
-        height: 70px;
+        width: 75px;
+        height: 75px;
     }
 }
