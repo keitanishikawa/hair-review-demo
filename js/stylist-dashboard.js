@@ -163,7 +163,7 @@ function updateChart() {
         case 'occupation':
             data = analyzeMaritalStatus(reviews);
             labels = Object.keys(data);
-            colors = ['#f4a5a5', '#c494c4', '#8b5a9e'];
+            colors = ['#f4a5a5', '#c494c4'];
             break;
         case 'children':
             data = analyzeChildren(reviews);
@@ -175,7 +175,7 @@ function updateChart() {
     renderChart(labels, Object.values(data), colors);
 }
 
-// Analyze style preferences (mock data based on comments)
+// Analyze style preferences from CSV data
 function analyzeStylePreferences(reviews) {
     const styles = {
         'カジュアル': 0,
@@ -185,22 +185,9 @@ function analyzeStylePreferences(reviews) {
     };
 
     reviews.forEach(review => {
-        const comment = review.コメント.toLowerCase();
-        if (comment.includes('カジュアル') || comment.includes('ナチュラル') || comment.includes('普段使い')) {
-            styles['カジュアル']++;
-        } else if (comment.includes('フェミニン') || comment.includes('女性らしい') || comment.includes('可愛い') || comment.includes('柔らか')) {
-            styles['フェミニン']++;
-        } else if (comment.includes('エレガント') || comment.includes('上品') || comment.includes('洗練')) {
-            styles['エレガント']++;
-        } else if (comment.includes('スタイリッシュ') || comment.includes('クール') || comment.includes('活動的')) {
-            styles['スタイリッシュ']++;
-        } else {
-            // Default distribution
-            const random = Math.random();
-            if (random < 0.35) styles['カジュアル']++;
-            else if (random < 0.6) styles['フェミニン']++;
-            else if (random < 0.8) styles['エレガント']++;
-            else styles['スタイリッシュ']++;
+        const style = review.女性像;
+        if (styles.hasOwnProperty(style)) {
+            styles[style]++;
         }
     });
 
@@ -229,33 +216,26 @@ function analyzeAgeGroups(reviews) {
     return ageGroups;
 }
 
-// Analyze marital status (mock data)
+// Analyze marital status from CSV data
 function analyzeMaritalStatus(reviews) {
     const maritalStatus = {
         '既婚': 0,
-        '未婚': 0,
-        '不明': 0
+        '未婚': 0
     };
 
     reviews.forEach(review => {
-        const occupation = review.職業;
-        if (occupation === '主婦') {
+        const status = review.既婚未婚;
+        if (status === '既婚') {
             maritalStatus['既婚']++;
-        } else if (occupation === '学生') {
+        } else if (status === '未婚') {
             maritalStatus['未婚']++;
-        } else {
-            // Random distribution for others
-            const random = Math.random();
-            if (random < 0.4) maritalStatus['既婚']++;
-            else if (random < 0.7) maritalStatus['未婚']++;
-            else maritalStatus['不明']++;
         }
     });
 
     return maritalStatus;
 }
 
-// Analyze children (mock data)
+// Analyze children from CSV data
 function analyzeChildren(reviews) {
     const children = {
         'あり': 0,
@@ -263,12 +243,10 @@ function analyzeChildren(reviews) {
     };
 
     reviews.forEach(review => {
-        const occupation = review.職業;
-        const age = parseInt(review.年齢);
-
-        if (occupation === '主婦' || age >= 35) {
+        const hasChildren = review.子供の有無;
+        if (hasChildren === 'あり') {
             children['あり']++;
-        } else {
+        } else if (hasChildren === 'なし') {
             children['なし']++;
         }
     });

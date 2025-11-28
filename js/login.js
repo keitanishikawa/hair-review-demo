@@ -1,21 +1,36 @@
-// Demo accounts configuration
-const DEMO_ACCOUNTS = [
-    'ito.jun@example.com',
-    'sato.misaki@example.com',
-    'tanaka.kenta@example.com'
-];
+// Stylist accounts loaded from CSV
+let VALID_ACCOUNTS = [];
 
 // DOM elements
 const emailInput = document.getElementById('email');
 const loginBtn = document.getElementById('loginBtn');
 const errorMessage = document.getElementById('errorMessage');
-const demoAccountElements = document.querySelectorAll('.demo-account');
 
 // Email validation regex
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+// Load valid accounts from CSV
+async function loadValidAccounts() {
+    try {
+        const response = await fetch('data/stylists.csv');
+        const csv = await response.text();
+        const parsed = Papa.parse(csv, {
+            header: true,
+            skipEmptyLines: true
+        });
+
+        VALID_ACCOUNTS = parsed.data.map(stylist => stylist.メールアドレス.toLowerCase());
+    } catch (error) {
+        console.error('Error loading stylists:', error);
+        showError('データの読み込みに失敗しました。ページを再読み込みしてください。');
+    }
+}
+
 // Initialize event listeners
-function init() {
+async function init() {
+    // Load valid accounts first
+    await loadValidAccounts();
+
     // Login button click handler
     loginBtn.addEventListener('click', handleLogin);
 
@@ -29,18 +44,6 @@ function init() {
     // Clear error message when user starts typing
     emailInput.addEventListener('input', () => {
         hideError();
-    });
-
-    // Demo account click handlers
-    demoAccountElements.forEach(element => {
-        element.addEventListener('click', () => {
-            const email = element.textContent.trim();
-            if (email) {
-                emailInput.value = email;
-                emailInput.focus();
-                hideError();
-            }
-        });
     });
 }
 
@@ -59,9 +62,9 @@ function handleLogin() {
         return;
     }
 
-    // Check if email is in demo accounts
-    if (!DEMO_ACCOUNTS.includes(email)) {
-        showError('このメールアドレスは登録されていません。デモアカウントをご利用ください。');
+    // Check if email is registered
+    if (!VALID_ACCOUNTS.includes(email)) {
+        showError('このメールアドレスは登録されていません。');
         return;
     }
 
@@ -131,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         handleLogin,
-        DEMO_ACCOUNTS,
+        loadValidAccounts,
         EMAIL_REGEX
     };
 }
