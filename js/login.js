@@ -1,8 +1,8 @@
 // Demo accounts configuration
 const DEMO_ACCOUNTS = [
-    'user1@demo.com',
-    'user2@demo.com',
-    'user3@demo.com'
+    'ito.jun@example.com',
+    'sato.misaki@example.com',
+    'tanaka.kenta@example.com'
 ];
 
 // DOM elements

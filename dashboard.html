@@ -3,116 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hair Design Review - Dashboard</title>
+    <title>Hair Design Review - マイダッシュボード</title>
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/stylist-dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 </head>
-<body class="dashboard-page">
+<body class="stylist-dashboard-page">
     <!-- Header -->
     <header class="dashboard-header">
+        <div class="header-gradient"></div>
         <div class="header-content">
-            <div class="logo-section">
-                <span class="logo-icon">✨</span>
-                <h1>Hair Design Review</h1>
-            </div>
-            <div class="user-section">
-                <span class="user-email" id="userEmail"></span>
-                <button id="logoutBtn" class="btn-logout">ログアウト</button>
+            <div class="stylist-profile">
+                <div class="profile-image-wrapper">
+                    <img id="profileImage" src="" alt="プロフィール画像" class="profile-image">
+                </div>
+                <h2 id="stylistName" class="stylist-name"></h2>
             </div>
         </div>
     </header>
 
     <!-- Main Content -->
     <main class="dashboard-main">
-        <div class="container">
-            <!-- Stats Section -->
-            <section class="stats-section">
-                <h2 class="section-title">📊 統計</h2>
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon">🎨</div>
-                        <div class="stat-value" id="totalDesigns">10</div>
-                        <div class="stat-label">デザイン総数</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">⭐</div>
-                        <div class="stat-value" id="avgRating">4.5</div>
-                        <div class="stat-label">平均評価</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">💬</div>
-                        <div class="stat-value" id="totalReviews">28</div>
-                        <div class="stat-label">レビュー総数</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">👁️</div>
-                        <div class="stat-value" id="totalViews">156</div>
-                        <div class="stat-label">閲覧数</div>
-                    </div>
-                </div>
-            </section>
+        <!-- Tab Section -->
+        <section class="tabs-section">
+            <h3 class="section-heading">あなたを評価した人のデータ</h3>
 
-            <!-- Gallery Section -->
-            <section class="gallery-section">
-                <h2 class="section-title">🖼️ ヘアデザインギャラリー</h2>
-                <div class="filter-buttons">
-                    <button class="filter-btn active" data-filter="all">すべて</button>
-                    <button class="filter-btn" data-filter="short">ショート</button>
-                    <button class="filter-btn" data-filter="medium">ミディアム</button>
-                    <button class="filter-btn" data-filter="long">ロング</button>
-                </div>
-                <div class="gallery-grid" id="galleryGrid">
-                    <!-- Gallery items will be dynamically loaded -->
-                </div>
-            </section>
-        </div>
+            <!-- Category Tabs -->
+            <div class="category-tabs">
+                <button class="category-tab active" data-category="style">女性像</button>
+                <button class="category-tab" data-category="age">年代</button>
+                <button class="category-tab" data-category="occupation">既婚</button>
+                <button class="category-tab" data-category="children">子供の有無</button>
+            </div>
+
+            <!-- Chart Container -->
+            <div class="chart-container">
+                <canvas id="demographicChart"></canvas>
+            </div>
+        </section>
+
+        <!-- Reviews Section -->
+        <section class="reviews-section">
+            <h3 class="section-heading">あなたの作品へのレビュー</h3>
+            <div id="reviewsList" class="reviews-list">
+                <!-- Reviews will be loaded dynamically -->
+            </div>
+        </section>
     </main>
 
-    <!-- Modal for Design Details -->
-    <div class="modal" id="designModal">
-        <div class="modal-content">
-            <button class="modal-close" id="modalClose">&times;</button>
-            <div class="modal-body">
-                <div class="modal-image">
-                    <img id="modalImage" src="" alt="Hair Design">
-                </div>
-                <div class="modal-info">
-                    <h3 id="modalTitle"></h3>
-                    <div class="rating-display">
-                        <div class="stars" id="modalStars"></div>
-                        <span class="rating-value" id="modalRatingValue"></span>
-                    </div>
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <button class="nav-item active" data-page="evaluation">
+            <span class="nav-icon">📊</span>
+            <span class="nav-label">評価</span>
+        </button>
+        <button class="nav-item" data-page="reviews">
+            <span class="nav-icon">💬</span>
+            <span class="nav-label">レビュー</span>
+        </button>
+        <button class="nav-item" data-page="popular">
+            <span class="nav-icon">⭐</span>
+            <span class="nav-label">人気作品</span>
+        </button>
+        <button class="nav-item" data-page="mypage">
+            <span class="nav-icon">👤</span>
+            <span class="nav-label">マイページ</span>
+        </button>
+    </nav>
 
-                    <!-- Add Review Section -->
-                    <div class="add-review">
-                        <h4>レビューを投稿</h4>
-                        <div class="rating-input">
-                            <span class="star-input" data-rating="1">☆</span>
-                            <span class="star-input" data-rating="2">☆</span>
-                            <span class="star-input" data-rating="3">☆</span>
-                            <span class="star-input" data-rating="4">☆</span>
-                            <span class="star-input" data-rating="5">☆</span>
-                        </div>
-                        <textarea
-                            id="reviewComment"
-                            placeholder="コメントを入力してください..."
-                            rows="3"
-                        ></textarea>
-                        <button id="submitReview" class="btn-primary">レビューを投稿</button>
-                    </div>
+    <!-- My Page Modal -->
+    <div id="mypageModal" class="modal">
+        <div class="modal-content mypage-content">
+            <h2 class="modal-title">マイページ</h2>
 
-                    <!-- Reviews List -->
-                    <div class="reviews-list">
-                        <h4>レビュー</h4>
-                        <div id="reviewsContainer">
-                            <!-- Reviews will be dynamically loaded -->
-                        </div>
-                    </div>
+            <div class="mypage-profile">
+                <div class="profile-image-large-wrapper">
+                    <img id="mypageProfileImage" src="" alt="プロフィール画像" class="profile-image-large">
                 </div>
             </div>
+
+            <div class="mypage-section">
+                <h3>プロフィール</h3>
+                <div class="profile-info">
+                    <p class="profile-name" id="mypageName"></p>
+                    <p class="profile-email" id="mypageEmail"></p>
+                </div>
+            </div>
+
+            <div class="mypage-section">
+                <h3>セキュリティ</h3>
+                <button class="mypage-button">パスワード変更</button>
+            </div>
+
+            <div class="mypage-section">
+                <h3>ログイン</h3>
+                <button id="logoutBtn" class="mypage-button logout-button">ログアウト</button>
+            </div>
+
+            <button class="modal-close-btn" onclick="document.getElementById('mypageModal').classList.remove('show')">閉じる</button>
         </div>
     </div>
 
-    <script src="js/dashboard.js"></script>
+    <script src="js/stylist-dashboard.js"></script>
 </body>
 </html>
