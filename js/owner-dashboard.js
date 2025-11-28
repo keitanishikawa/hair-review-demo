@@ -744,10 +744,7 @@ function initializeComparisonTab() {
         sortedStylists.forEach(stylist => {
             const option = document.createElement('option');
             option.value = stylist['アップロード画像ファイル名'];
-            const reviewCount = getReviewCount(stylist);
-            const stylistAge = parseInt(stylist['年齢']) || '';
-            const ageText = stylistAge ? ` ${stylistAge}歳` : '';
-            option.textContent = `${stylist['姓名']}${ageText} (${reviewCount}件)`;
+            option.textContent = stylist['姓名'];
             select.appendChild(option);
         });
 
