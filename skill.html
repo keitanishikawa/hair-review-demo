@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frontend Design Skill — 独創的なインターフェース創造のためのガイド</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Serif+4:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #1a1a1a;
+            --text-primary: #f5f5f5;
+            --text-secondary: #b8b8b8;
+            --accent-gold: #d4af37;
+            --accent-rose: #e8b4b8;
+            --accent-sage: #8a9a7b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Source Serif 4', serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        /* Animated background effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background:
+                radial-gradient(circle at 20% 50%, rgba(212, 175, 55, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(232, 180, 184, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(138, 154, 123, 0.05) 0%, transparent 50%);
+            animation: drift 30s ease-in-out infinite;
+            z-index: 0;
+        }
+
+        @keyframes drift {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(5%, 5%) rotate(3deg); }
+            66% { transform: translate(-3%, 3%) rotate(-2deg); }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 6rem;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .skill-badge {
+            display: inline-block;
+            font-size: 0.75rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--accent-gold);
+            border: 1px solid var(--accent-gold);
+            padding: 0.5rem 1.5rem;
+            margin-bottom: 2rem;
+            animation: glow 3s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 5px rgba(212, 175, 55, 0.3); }
+            50% { box-shadow: 0 0 20px rgba(212, 175, 55, 0.6); }
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--accent-gold), var(--accent-rose), var(--accent-sage));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            font-weight: 300;
+            max-width: 700px;
+            margin: 0 auto;
+            font-style: italic;
+        }
+
+        section {
+            margin-bottom: 5rem;
+            animation: fadeInUp 1s ease-out;
+            animation-fill-mode: both;
+        }
+
+        section:nth-child(2) { animation-delay: 0.2s; }
+        section:nth-child(3) { animation-delay: 0.4s; }
+        section:nth-child(4) { animation-delay: 0.6s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            color: var(--accent-gold);
+            position: relative;
+            display: inline-block;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 60%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-gold), transparent);
+        }
+
+        .intro {
+            font-size: 1.2rem;
+            line-height: 1.9;
+            margin-bottom: 3rem;
+            color: var(--text-secondary);
+        }
+
+        .design-thinking {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .thinking-card {
+            background: var(--bg-secondary);
+            padding: 2rem;
+            border-left: 3px solid var(--accent-gold);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .thinking-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.05), transparent);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .thinking-card:hover {
+            transform: translateX(10px);
+            box-shadow: -10px 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .thinking-card:hover::before {
+            opacity: 1;
+        }
+
+        .thinking-card h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: var(--accent-rose);
+            margin-bottom: 1rem;
+        }
+
+        .thinking-card p {
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        .guidelines-grid {
+            display: grid;
+            gap: 3rem;
+            margin-top: 3rem;
+        }
+
+        .guideline-item {
+            background: var(--bg-secondary);
+            padding: 2.5rem;
+            border-radius: 2px;
+            border-top: 4px solid var(--accent-sage);
+            transition: all 0.3s ease;
+        }
+
+        .guideline-item:hover {
+            transform: scale(1.02);
+            border-top-color: var(--accent-rose);
+        }
+
+        .guideline-item h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: var(--accent-gold);
+            margin-bottom: 1rem;
+        }
+
+        .guideline-item p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .critical-note {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(232, 180, 184, 0.1));
+            border: 2px solid var(--accent-gold);
+            padding: 2rem;
+            margin: 3rem 0;
+            position: relative;
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(212, 175, 55, 0); }
+        }
+
+        .critical-note::before {
+            content: '★';
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            font-size: 2rem;
+            color: var(--accent-gold);
+            background: var(--bg-primary);
+            padding: 0 10px;
+        }
+
+        .critical-note strong {
+            color: var(--accent-gold);
+            font-size: 1.1rem;
+        }
+
+        .never-list {
+            background: rgba(232, 180, 184, 0.05);
+            border-left: 4px solid var(--accent-rose);
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .never-list h4 {
+            color: var(--accent-rose);
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .never-list ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .never-list li {
+            padding: 0.5rem 0 0.5rem 2rem;
+            position: relative;
+            color: var(--text-secondary);
+        }
+
+        .never-list li::before {
+            content: '✗';
+            position: absolute;
+            left: 0;
+            color: var(--accent-rose);
+            font-weight: bold;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 6rem;
+            padding: 3rem 0;
+            border-top: 1px solid rgba(212, 175, 55, 0.2);
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        footer strong {
+            color: var(--accent-gold);
+            font-size: 1.1rem;
+            font-style: normal;
+        }
+
+        /* Scroll reveal effect */
+        @media (prefers-reduced-motion: no-preference) {
+            .guideline-item {
+                opacity: 0;
+                transform: translateY(20px);
+                animation: fadeInUp 0.8s ease-out forwards;
+            }
+
+            .guideline-item:nth-child(1) { animation-delay: 0.1s; }
+            .guideline-item:nth-child(2) { animation-delay: 0.2s; }
+            .guideline-item:nth-child(3) { animation-delay: 0.3s; }
+            .guideline-item:nth-child(4) { animation-delay: 0.4s; }
+            .guideline-item:nth-child(5) { animation-delay: 0.5s; }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 2rem 1.5rem;
+            }
+
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            h2 {
+                font-size: 2rem;
+            }
+
+            .design-thinking {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="skill-badge">Frontend Design Skill</div>
+            <h1>独創的なインターフェース<br>創造のためのガイド</h1>
+            <p class="subtitle">生産品質の美しいフロントエンドを構築し、ありふれたAI的デザインを超える</p>
+        </header>
+
+        <section class="intro-section">
+            <p class="intro">
+                このスキルは、汎用的な「AIっぽい」美学を避け、独創的で生産グレードのフロントエンドインターフェースの作成を導きます。
+                美的細部と創造的な選択に格別の注意を払い、実際に動作するコードを実装します。
+            </p>
+        </section>
+
+        <section>
+            <h2>デザイン思考</h2>
+            <p>コーディングの前に、コンテキストを理解し、<strong>大胆な</strong>美的方向性にコミットしましょう:</p>
+
+            <div class="design-thinking">
+                <div class="thinking-card">
+                    <h3>目的</h3>
+                    <p>このインターフェースはどんな問題を解決するのか？誰が使うのか？</p>
+                </div>
+
+                <div class="thinking-card">
+                    <h3>トーン</h3>
+                    <p>極端な選択をする：残酷なミニマル、最大主義的カオス、レトロフューチャー、オーガニック/ナチュラル、ラグジュアリー/洗練、遊び心/トイライク、エディトリアル/マガジン、ブルータリスト/ロー、アールデコ/ジオメトリック、ソフト/パステル、インダストリアル/ユーティリタリアンなど。</p>
+                </div>
+
+                <div class="thinking-card">
+                    <h3>制約</h3>
+                    <p>技術要件（フレームワーク、パフォーマンス、アクセシビリティ）を把握する。</p>
+                </div>
+
+                <div class="thinking-card">
+                    <h3>差別化</h3>
+                    <p>何がこれを<strong>忘れられないもの</strong>にするのか？人々が覚えている一つのことは何か？</p>
+                </div>
+            </div>
+
+            <div class="critical-note">
+                <p><strong>重要:</strong> 明確な概念的方向性を選択し、精密に実行してください。大胆な最大主義も洗練されたミニマリズムも機能します — 鍵は意図性であり、強度ではありません。</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>フロントエンド美学ガイドライン</h2>
+
+            <div class="guidelines-grid">
+                <div class="guideline-item">
+                    <h3>タイポグラフィ</h3>
+                    <p>美しく、ユニークで、興味深いフォントを選択します。ArialやInterのような汎用フォントを避け、代わりにフロントエンドの美学を高める独特の選択を選びましょう。予期しない、個性的なフォント選択。独特なディスプレイフォントと洗練されたボディフォントをペアリングします。</p>
+                </div>
+
+                <div class="guideline-item">
+                    <h3>色とテーマ</h3>
+                    <p>まとまった美学にコミットします。一貫性のためにCSS変数を使用します。支配的な色と鋭いアクセントは、臆病で均等に分散されたパレットを上回ります。</p>
+                </div>
+
+                <div class="guideline-item">
+                    <h3>モーション</h3>
+                    <p>エフェクトとマイクロインタラクションにアニメーションを使用します。HTMLにはCSSのみのソリューションを優先します。利用可能な場合はReactにMotionライブラリを使用します。高インパクトの瞬間に焦点を当てます：時間差のある表示を伴う1つのよく編成されたページロードは、散在するマイクロインタラクションよりも多くの喜びを生み出します。</p>
+                </div>
+
+                <div class="guideline-item">
+                    <h3>空間構成</h3>
+                    <p>予期しないレイアウト。非対称性。重なり。対角線の流れ。グリッドを破る要素。寛大なネガティブスペースまたは制御された密度。</p>
+                </div>
+
+                <div class="guideline-item">
+                    <h3>背景とビジュアルディテール</h3>
+                    <p>ソリッドカラーをデフォルトにするのではなく、雰囲気と深さを作り出します。全体的な美学に合った文脈的エフェクトとテクスチャを追加します。グラデーションメッシュ、ノイズテクスチャ、幾何学的パターン、レイヤードトランスペアレンシー、ドラマティックなシャドウ、装飾的なボーダー、カスタムカーソル、グレインオーバーレイなどの創造的な形式を適用します。</p>
+                </div>
+            </div>
+
+            <div class="never-list">
+                <h4>決して使用しないもの</h4>
+                <ul>
+                    <li>使いすぎのフォントファミリー（Inter、Roboto、Arial、システムフォント）</li>
+                    <li>陳腐なカラースキーム（特に白い背景に紫のグラデーション）</li>
+                    <li>予測可能なレイアウトとコンポーネントパターン</li>
+                    <li>文脈固有のキャラクターを欠く型通りのデザイン</li>
+                </ul>
+            </div>
+
+            <p style="margin-top: 2rem; color: var(--text-secondary);">
+                創造的に解釈し、文脈に対して真に設計されたと感じられる予期しない選択を行います。
+                どのデザインも同じであってはなりません。ライトとダークのテーマ、異なるフォント、異なる美学の間で変化させます。
+                世代を超えて共通の選択（たとえばSpace Grotesk）に収束しないでください。
+            </p>
+
+            <div class="critical-note">
+                <p><strong>重要:</strong> 実装の複雑さを美的ビジョンに合わせます。最大主義的なデザインには、広範なアニメーションとエフェクトを伴う精巧なコードが必要です。ミニマリストまたは洗練されたデザインには、抑制、精度、そして間隔、タイポグラフィ、微妙なディテールへの注意深い配慮が必要です。エレガンスはビジョンをうまく実行することから生まれます。</p>
+            </div>
+        </section>
+
+        <footer>
+            <p><strong>覚えておいてください:</strong> Claudeは並外れた創造的な作業が可能です。<br>
+            遠慮せず、型にはまらない思考と独特のビジョンへの完全なコミットメントによって真に創造できるものを示してください。</p>
+        </footer>
+    </div>
+</body>
+</html>
