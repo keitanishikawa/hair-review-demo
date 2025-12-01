@@ -14,6 +14,14 @@ const COLOR_PALETTE = {
     full: ['#667eea', '#764ba2', '#9b59b6', '#f093fb', '#ff6b9d', '#20e3b2', '#feca57']
 };
 
+// Helper function to normalize child status display
+function normalizeChildStatus(status) {
+    if (!status) return '-';
+    if (status === '有' || status === 'いる') return 'いる';
+    if (status === '無' || status === 'いない') return 'いない';
+    return status;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     checkAuth();
     loadOwnerDashboard();
@@ -112,7 +120,7 @@ function calculateStaffStats() {
 
         // Count married/has children
         const marriedCount = reviews.filter(r => r.maritalStatus === '既婚').length;
-        const hasChildrenCount = reviews.filter(r => r.hasChildren === '有').length;
+        const hasChildrenCount = reviews.filter(r => r.hasChildren === '有' || r.hasChildren === 'いる').length;
 
         // Find most popular woman type
         const womanTypeCounts = {};
@@ -258,7 +266,7 @@ function displayStaffCards() {
                 <div class="staff-header">
                     ${avatarHtml}
                     <div class="staff-info">
-                        <div class="staff-name">${staff.name}</div>
+                        <div class="staff-name">${staff.name} (${staff.targetAge || '-'})</div>
                         <div class="staff-salon">${staff.salon}</div>
                         <div class="staff-age">平均 ${staff.avgAge}歳</div>
                     </div>
@@ -771,10 +779,10 @@ function createDemographicsCharts(surveys) {
     });
 
     // Children Distribution
-    const children = { 'なし': 0, 'あり': 0 };
+    const children = { 'いない': 0, 'いる': 0 };
     surveys.forEach(s => {
-        if (s.hasChildren === '有') children['あり']++;
-        else if (s.hasChildren === '無') children['なし']++;
+        if (s.hasChildren === '有' || s.hasChildren === 'いる') children['いる']++;
+        else if (s.hasChildren === '無' || s.hasChildren === 'いない') children['いない']++;
     });
 
     const childrenCtx = document.getElementById('demo-children-chart');

@@ -16,6 +16,14 @@ const COLOR_PALETTE = {
     womanType: ['#FFB6C1', '#FFC0CB', '#C8A2C8', '#9370DB', '#DDA0DD', '#E6E6FA']
 };
 
+// Helper function to normalize child status display
+function normalizeChildStatus(status) {
+    if (!status || status === '未回答') return '未回答';
+    if (status === '有' || status === 'いる') return 'いる';
+    if (status === '無' || status === 'いない') return 'いない';
+    return status;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     checkAuth();
     loadDashboardData();
@@ -331,7 +339,7 @@ function createMaritalChart() {
 function createChildrenChart() {
     const children = {};
     myReviews.forEach(review => {
-        const has = review.hasChildren || '未回答';
+        const has = normalizeChildStatus(review.hasChildren);
         children[has] = (children[has] || 0) + 1;
     });
 
@@ -535,7 +543,7 @@ function displayReviews() {
             <div class="review-meta">
                 #${i + 1} | ${review.age}歳 ${review.gender || ''} |
                 ${review.womanType || '-'} | ${review.occupation || '-'} |
-                ${review.maritalStatus || '-'} | ${review.hasChildren || '-'}
+                ${review.maritalStatus || '-'} | ${normalizeChildStatus(review.hasChildren)}
             </div>
         </div>
     `).join('');
