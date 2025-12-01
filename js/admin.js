@@ -283,6 +283,129 @@ function handleSurveyCSV(file) {
     });
 }
 
+// Handle hairdresser data from textarea (copy-paste)
+function handleHairdresserData() {
+    const textarea = document.getElementById('hairdresser-data');
+    const data = textarea.value.trim();
+
+    if (!data) {
+        showMessage('hairdresser-success', 'データを入力してください', false);
+        return;
+    }
+
+    Papa.parse(data, {
+        header: true,
+        delimiter: '\t', // Tab-separated for Excel copy-paste
+        skipEmptyLines: true,
+        complete: (results) => {
+            try {
+                // Also try comma-separated if tab-separated fails
+                if (!results.meta.fields || results.meta.fields.length < 5) {
+                    Papa.parse(data, {
+                        header: true,
+                        delimiter: ',',
+                        skipEmptyLines: true,
+                        complete: (retryResults) => {
+                            processHairdresserData(retryResults);
+                        }
+                    });
+                } else {
+                    processHairdresserData(results);
+                }
+            } catch (error) {
+                console.error('Parse error:', error);
+                showMessage('hairdresser-success', 'データの処理中にエラーが発生しました', false);
+            }
+        }
+    });
+}
+
+function processHairdresserData(results) {
+    const hairdressers = results.data
+        .filter(row => row.メールアドレス || row.email)
+        .map(row => ({
+            name: row.氏名 || row.name || '',
+            salon: row.サロン名 || row.salon || '',
+            email: row.メールアドレス || row.email || '',
+            targetAge: row.ターゲット年齢 || row.target_age || row['ターゲット年齢'] || '',
+            imageFile: row.画像ファイル名 || row.image_file || row['画像ファイル名'] || ''
+        }));
+
+    if (hairdressers.length === 0) {
+        showMessage('hairdresser-success', 'データが見つかりませんでした。列順を確認してください', false);
+        return;
+    }
+
+    console.log(`✅ ${hairdressers.length}件の美容師データを解析しました`);
+    localStorage.setItem('hairdressers', JSON.stringify(hairdressers));
+    showMessage('hairdresser-success', `${hairdressers.length}件の美容師データを登録しました`, true);
+    loadSystemStatus();
+}
+
+// Handle survey data from textarea (copy-paste)
+function handleSurveyData() {
+    const textarea = document.getElementById('survey-data');
+    const data = textarea.value.trim();
+
+    if (!data) {
+        showMessage('survey-success', 'データを入力してください', false);
+        return;
+    }
+
+    Papa.parse(data, {
+        header: true,
+        delimiter: '\t', // Tab-separated for Excel copy-paste
+        skipEmptyLines: true,
+        complete: (results) => {
+            try {
+                // Also try comma-separated if tab-separated fails
+                if (!results.meta.fields || results.meta.fields.length < 7) {
+                    Papa.parse(data, {
+                        header: true,
+                        delimiter: ',',
+                        skipEmptyLines: true,
+                        complete: (retryResults) => {
+                            processSurveyData(retryResults);
+                        }
+                    });
+                } else {
+                    processSurveyData(results);
+                }
+            } catch (error) {
+                console.error('Parse error:', error);
+                showMessage('survey-success', 'データの処理中にエラーが発生しました', false);
+            }
+        }
+    });
+}
+
+function processSurveyData(results) {
+    console.log('📊 Survey Headers:', results.meta.fields);
+    console.log('📊 Sample Row:', results.data[0]);
+
+    const surveys = results.data
+        .filter(row => row.画像ファイル名 || row.imageFile || row['画像ファイル名'])
+        .map(row => ({
+            age: row.年齢 || row.age || '',
+            prefecture: row.都道府県 || row.prefecture || '',
+            gender: row.性別 || row.gender || '',
+            maritalStatus: row.結婚 || row.marital_status || row.結婚状態 || '',
+            occupation: row.職業 || row.occupation || '',
+            hasChildren: row.子供有無 || row.has_children || row['子供有無'] || '',
+            imageFile: row.画像ファイル名 || row.imageFile || row['画像ファイル名'] || ''
+        }));
+
+    if (surveys.length === 0) {
+        showMessage('survey-success', 'データが見つかりませんでした。列順を確認してください', false);
+        return;
+    }
+
+    console.log(`✅ ${surveys.length}件のアンケートデータを解析しました`);
+    localStorage.setItem('surveys', JSON.stringify(surveys));
+    showMessage('survey-success', `${surveys.length}件のアンケートデータを登録しました`, true);
+    loadSystemStatus();
+}
+
 async function handleImageZIP(file) {
     if (!file) return;
 
