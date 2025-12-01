@@ -283,6 +283,30 @@ function handleSurveyCSV(file) {
     });
 }
 
+// Smart column mapping for flexible header names
+function findColumn(row, possibleNames) {
+    for (const name of possibleNames) {
+        if (row[name] !== undefined && row[name] !== '') {
+            return row[name];
+        }
+    }
+    return '';
+}
+
+function detectColumnMapping(headers, expectedFields) {
+    const mapping = {};
+    expectedFields.forEach(field => {
+        const foundHeader = headers.find(h =>
+            field.aliases.some(alias =>
+                h.toLowerCase().includes(alias.toLowerCase()) ||
+                alias.toLowerCase().includes(h.toLowerCase())
+            )
+        );
+        mapping[field.name] = foundHeader || null;
+    });
+    return mapping;
+}
+
 // Preview hairdresser data in table format
 let parsedHairdresserData = null;
 
@@ -324,10 +348,40 @@ function displayHairdresserPreview(results) {
     const previewDiv = document.getElementById('hairdresser-preview');
     const countSpan = document.getElementById('hairdresser-count-preview');
 
-    const headers = ['氏名', 'サロン名', 'メールアドレス', 'ターゲット年齢', '画像ファイル名'];
+    // Define expected fields with aliases
+    const expectedFields = [
+        { name: '氏名', aliases: ['氏名', '名前', 'name', '姓名', 'なまえ', 'ネーム'] },
+        { name: 'サロン名', aliases: ['サロン名', '店名', 'salon', 'サロン', 'shop', 'store', '店舗名'] },
+        { name: 'メールアドレス', aliases: ['メールアドレス', 'メール', 'email', 'mail', 'e-mail', 'アドレス'] },
+        { name: 'ターゲット年齢', aliases: ['ターゲット年齢', 'ターゲット', 'target_age', 'target', '年齢層', '対象年齢'] },
+        { name: '画像ファイル名', aliases: ['画像ファイル名', '画像', 'image_file', 'imageFile', 'ファイル名', 'file', 'filename', '画像名'] }
+    ];
 
-    let html = '<thead><tr>';
-    headers.forEach(h => {
+    // Detect column mapping
+    const headers = results.meta.fields || Object.keys(results.data[0] || {});
+    const mapping = detectColumnMapping(headers, expectedFields);
+
+    // Display mapping info
+    let mappingHtml = '<div style="background: #f0f4ff; padding: 12px; border-radius: 8px; margin-bottom: 16px; font-size: 13px;">';
+    mappingHtml += '<strong>📍 列のマッピング:</strong> ';
+    const mappingItems = [];
+    expectedFields.forEach(field => {
+        const mappedHeader = mapping[field.name];
+        if (mappedHeader) {
+            mappingItems.push(`<span style="color: #2ecc71;">✓ ${field.name} ← "${mappedHeader}"</span>`);
+        } else {
+            mappingItems.push(`<span style="color: #ff6b6b;">✗ ${field.name} (見つかりません)</span>`);
+        }
+    });
+    mappingHtml += mappingItems.join(' | ');
+    mappingHtml += '</div>';
+
+    const headers_display = ['氏名', 'サロン名', 'メールアドレス', 'ターゲット年齢', '画像ファイル名'];
+
+    let html = mappingHtml;
+    html += '<table style="width: 100%; border-collapse: collapse; background: white; font-size: 13px;">';
+    html += '<thead><tr>';
+    headers_display.forEach(h => {
         html += `<th style="padding: 12px; background: #667eea; color: white; text-align: left; border-bottom: 2px solid #fff; white-space: nowrap;">${h}</th>`;
     });
     html += '</tr></thead><tbody>';
@@ -335,15 +389,15 @@ function displayHairdresserPreview(results) {
     results.data.forEach((row, i) => {
         const bgColor = i % 2 === 0 ? '#f8f9fa' : '#ffffff';
         html += `<tr style="background: ${bgColor};">`;
-        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${row.氏名 || row.name || '-'}</td>`;
-        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${row.サロン名 || row.salon || '-'}</td>`;
-        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${row.メールアドレス || row.email || '-'}</td>`;
-        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${row.ターゲット年齢 || row.target_age || row['ターゲット年齢'] || '-'}</td>`;
-        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0; font-family: monospace; font-size: 12px;">${row.画像ファイル名 || row.image_file || row['画像ファイル名'] || '-'}</td>`;
+        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${findColumn(row, ['氏名', '名前', 'name', '姓名']) || '-'}</td>`;
+        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${findColumn(row, ['サロン名', '店名', 'salon', 'サロン', 'shop', 'store', '店舗名']) || '-'}</td>`;
+        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${findColumn(row, ['メールアドレス', 'メール', 'email', 'mail', 'e-mail']) || '-'}</td>`;
+        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${findColumn(row, ['ターゲット年齢', 'ターゲット', 'target_age', 'target', '年齢層']) || '-'}</td>`;
+        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0; font-family: monospace; font-size: 12px;">${findColumn(row, ['画像ファイル名', '画像', 'image_file', 'imageFile', 'ファイル名', 'file']) || '-'}</td>`;
         html += '</tr>';
     });
 
-    html += '</tbody>';
+    html += '</tbody></table>';
     table.innerHTML = html;
     countSpan.textContent = results.data.length;
     previewDiv.style.display = 'block';
@@ -359,13 +413,13 @@ function confirmHairdresserData() {
 
 function processHairdresserData(results) {
     const hairdressers = results.data
-        .filter(row => row.メールアドレス || row.email)
+        .filter(row => findColumn(row, ['メールアドレス', 'メール', 'email', 'mail']))
         .map(row => ({
-            name: row.氏名 || row.name || '',
-            salon: row.サロン名 || row.salon || '',
-            email: row.メールアドレス || row.email || '',
-            targetAge: row.ターゲット年齢 || row.target_age || row['ターゲット年齢'] || '',
-            imageFile: row.画像ファイル名 || row.image_file || row['画像ファイル名'] || ''
+            name: findColumn(row, ['氏名', '名前', 'name', '姓名']),
+            salon: findColumn(row, ['サロン名', '店名', 'salon', 'サロン', 'shop', 'store']),
+            email: findColumn(row, ['メールアドレス', 'メール', 'email', 'mail', 'e-mail']),
+            targetAge: findColumn(row, ['ターゲット年齢', 'ターゲット', 'target_age', 'target', '年齢層']),
+            imageFile: findColumn(row, ['画像ファイル名', '画像', 'image_file', 'imageFile', 'ファイル名', 'file'])
         }));
 
     if (hairdressers.length === 0) {
@@ -420,10 +474,42 @@ function displaySurveyPreview(results) {
     const previewDiv = document.getElementById('survey-preview');
     const countSpan = document.getElementById('survey-count-preview');
 
-    const headers = ['年齢', '都道府県', '性別', '結婚', '職業', '子供有無', '画像ファイル名'];
+    // Define expected fields with aliases
+    const expectedFields = [
+        { name: '年齢', aliases: ['年齢', 'age', 'ねんれい', 'エイジ', '歳'] },
+        { name: '都道府県', aliases: ['都道府県', '県', 'prefecture', '住所', '地域', '都道府', 'エリア'] },
+        { name: '性別', aliases: ['性別', 'gender', 'sex', '男女', '性'] },
+        { name: '結婚', aliases: ['結婚', '婚姻', 'marital_status', 'marital', '既婚', '未婚', '結婚状態'] },
+        { name: '職業', aliases: ['職業', 'occupation', 'job', '仕事', 'work'] },
+        { name: '子供有無', aliases: ['子供有無', '子供', 'has_children', 'children', '子ども', 'こども', '子供の有無'] },
+        { name: '画像ファイル名', aliases: ['画像ファイル名', '画像', 'image_file', 'imageFile', 'ファイル名', 'file', 'filename', '画像名'] }
+    ];
 
-    let html = '<thead><tr>';
-    headers.forEach(h => {
+    // Detect column mapping
+    const headers = results.meta.fields || Object.keys(results.data[0] || {});
+    const mapping = detectColumnMapping(headers, expectedFields);
+
+    // Display mapping info
+    let mappingHtml = '<div style="background: #f0f4ff; padding: 12px; border-radius: 8px; margin-bottom: 16px; font-size: 13px;">';
+    mappingHtml += '<strong>📍 列のマッピング:</strong> ';
+    const mappingItems = [];
+    expectedFields.forEach(field => {
+        const mappedHeader = mapping[field.name];
+        if (mappedHeader) {
+            mappingItems.push(`<span style="color: #2ecc71;">✓ ${field.name} ← "${mappedHeader}"</span>`);
+        } else {
+            mappingItems.push(`<span style="color: #ff6b6b;">✗ ${field.name} (見つかりません)</span>`);
+        }
+    });
+    mappingHtml += mappingItems.join(' | ');
+    mappingHtml += '</div>';
+
+    const headers_display = ['年齢', '都道府県', '性別', '結婚', '職業', '子供有無', '画像ファイル名'];
+
+    let html = mappingHtml;
+    html += '<table style="width: 100%; border-collapse: collapse; background: white; font-size: 13px;">';
+    html += '<thead><tr>';
+    headers_display.forEach(h => {
         html += `<th style="padding: 12px; background: #667eea; color: white; text-align: left; border-bottom: 2px solid #fff; white-space: nowrap;">${h}</th>`;
     });
     html += '</tr></thead><tbody>';
@@ -431,17 +517,17 @@ function displaySurveyPreview(results) {
     results.data.forEach((row, i) => {
         const bgColor = i % 2 === 0 ? '#f8f9fa' : '#ffffff';
         html += `<tr style="background: ${bgColor};">`;
-        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${row.年齢 || row.age || '-'}</td>`;
-        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${row.都道府県 || row.prefecture || '-'}</td>`;
-        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${row.性別 || row.gender || '-'}</td>`;
-        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${row.結婚 || row.marital_status || row.結婚状態 || '-'}</td>`;
-        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${row.職業 || row.occupation || '-'}</td>`;
-        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${row.子供有無 || row.has_children || row['子供有無'] || '-'}</td>`;
-        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0; font-family: monospace; font-size: 12px;">${row.画像ファイル名 || row.imageFile || row['画像ファイル名'] || '-'}</td>`;
+        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${findColumn(row, ['年齢', 'age', 'ねんれい']) || '-'}</td>`;
+        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${findColumn(row, ['都道府県', '県', 'prefecture', '住所', '地域']) || '-'}</td>`;
+        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${findColumn(row, ['性別', 'gender', 'sex', '男女']) || '-'}</td>`;
+        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${findColumn(row, ['結婚', '婚姻', 'marital_status', 'marital', '結婚状態']) || '-'}</td>`;
+        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${findColumn(row, ['職業', 'occupation', 'job', '仕事']) || '-'}</td>`;
+        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${findColumn(row, ['子供有無', '子供', 'has_children', 'children', '子ども']) || '-'}</td>`;
+        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0; font-family: monospace; font-size: 12px;">${findColumn(row, ['画像ファイル名', '画像', 'image_file', 'imageFile', 'ファイル名']) || '-'}</td>`;
         html += '</tr>';
     });
 
-    html += '</tbody>';
+    html += '</tbody></table>';
     table.innerHTML = html;
     countSpan.textContent = results.data.length;
     previewDiv.style.display = 'block';
@@ -460,15 +546,15 @@ function processSurveyData(results) {
     console.log('📊 Sample Row:', results.data[0]);
 
     const surveys = results.data
-        .filter(row => row.画像ファイル名 || row.imageFile || row['画像ファイル名'])
+        .filter(row => findColumn(row, ['画像ファイル名', '画像', 'image_file', 'imageFile', 'ファイル名']))
         .map(row => ({
-            age: row.年齢 || row.age || '',
-            prefecture: row.都道府県 || row.prefecture || '',
-            gender: row.性別 || row.gender || '',
-            maritalStatus: row.結婚 || row.marital_status || row.結婚状態 || '',
-            occupation: row.職業 || row.occupation || '',
-            hasChildren: row.子供有無 || row.has_children || row['子供有無'] || '',
-            imageFile: row.画像ファイル名 || row.imageFile || row['画像ファイル名'] || ''
+            age: findColumn(row, ['年齢', 'age', 'ねんれい']),
+            prefecture: findColumn(row, ['都道府県', '県', 'prefecture', '住所', '地域']),
+            gender: findColumn(row, ['性別', 'gender', 'sex', '男女']),
+            maritalStatus: findColumn(row, ['結婚', '婚姻', 'marital_status', 'marital', '結婚状態']),
+            occupation: findColumn(row, ['職業', 'occupation', 'job', '仕事']),
+            hasChildren: findColumn(row, ['子供有無', '子供', 'has_children', 'children', '子ども', '子供の有無']),
+            imageFile: findColumn(row, ['画像ファイル名', '画像', 'image_file', 'imageFile', 'ファイル名'])
         }));
 
     if (surveys.length === 0) {
