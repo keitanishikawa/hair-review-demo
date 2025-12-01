@@ -4,105 +4,386 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>美容師ダッシュボード | Hair Design Review</title>
-    <link rel="stylesheet" href="css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #feca57 100%);
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(255, 255, 255, 0.05) 10px,
+                rgba(255, 255, 255, 0.05) 20px
+            );
+            animation: slide 20s linear infinite;
+        }
+
+        @keyframes slide {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        .logo {
+            position: relative;
+            z-index: 1;
+            color: white;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .logo-text {
+            font-size: 32px;
+        }
+
+        .logo-year {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .profile {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .profile-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 4px solid white;
+            background: white;
+            margin: 0 auto 12px;
+            overflow: hidden;
+        }
+
+        .profile-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-name {
+            color: white;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .profile-salon {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .main-content {
+            background: white;
+            margin: -20px 0 0 0;
+            border-radius: 20px 20px 0 0;
+            padding: 24px 16px;
+            min-height: calc(100vh - 280px);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 16px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            background: #f5f5f5;
+            border: none;
+            border-radius: 20px;
+            font-size: 14px;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .chart-container {
+            margin: 20px 0;
+            padding: 20px;
+            background: #fafafa;
+            border-radius: 16px;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
+            margin: 0 auto;
+            max-width: 300px;
+        }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 16px;
+            justify-content: center;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+
+        .reviews-section {
+            margin-top: 32px;
+        }
+
+        .review-card {
+            background: #fafafa;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        .review-meta {
+            font-size: 13px;
+            color: #999;
+            margin-bottom: 8px;
+        }
+
+        .review-text {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            z-index: 100;
+        }
+
+        .nav-item {
+            text-align: center;
+            color: #999;
+            text-decoration: none;
+            flex: 1;
+            padding: 8px;
+            transition: all 0.3s;
+        }
+
+        .nav-item.active {
+            color: #667eea;
+        }
+
+        .nav-icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+
+        .nav-label {
+            font-size: 12px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            opacity: 0.9;
+        }
+
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+    </style>
 </head>
-<body class="dashboard-page">
-    <header class="header">
-        <div class="header-content">
-            <div class="header-logo">
-                <span class="logo-text">id</span>
-                <span class="logo-year">2025</span>
-            </div>
-            <div class="header-user">
-                <span class="user-name" id="user-name"></span>
-                <button class="logout-btn" onclick="logout()">ログアウト</button>
-            </div>
+<body>
+    <div class="header">
+        <button class="logout-btn" onclick="logout()">ログアウト</button>
+        <div class="logo">
+            <div class="logo-text">id</div>
+            <div class="logo-year">2025</div>
         </div>
-    </header>
-
-    <main class="main-container">
-        <div class="page-header">
-            <h1 class="page-title">あなたのダッシュボード</h1>
-            <p class="page-subtitle" id="salon-name"></p>
+        <div class="profile">
+            <div class="profile-image">
+                <img id="profile-img" src="" alt="プロフィール">
+            </div>
+            <div class="profile-name" id="user-name"></div>
+            <div class="profile-salon" id="salon-name"></div>
         </div>
+    </div>
 
-        <!-- Stats Grid -->
+    <div class="main-content">
         <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-label">総レビュー数</div>
+            <div class="stat-box">
                 <div class="stat-value" id="review-count">0</div>
+                <div class="stat-label">レビュー</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-label">ターゲット年齢</div>
-                <div class="stat-value" id="target-age" style="font-size: 28px;">-</div>
+            <div class="stat-box">
+                <div class="stat-value" id="target-age">-</div>
+                <div class="stat-label">ターゲット</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-label">最多女性像</div>
-                <div class="stat-value" id="top-woman-type" style="font-size: 24px;">-</div>
+            <div class="stat-box">
+                <div class="stat-value" id="top-type" style="font-size: 14px;">-</div>
+                <div class="stat-label">最多像</div>
             </div>
         </div>
 
-        <!-- Design Image Section -->
-        <section class="content-section">
-            <div class="section-header">
-                <h2 class="section-title">📸 投稿スタイル</h2>
-            </div>
-            <div class="design-card">
-                <img id="design-image" alt="ヘアデザイン" class="design-image" style="width: 100%; height: 400px; object-fit: cover; border-radius: 8px;">
-            </div>
-        </section>
+        <div class="section-title">あなたを評価した人のデータ</div>
 
-        <!-- Demographics Analysis -->
-        <section class="content-section">
-            <div class="section-header">
-                <h2 class="section-title">📊 レビュアー属性分析</h2>
+        <div class="tabs">
+            <button class="tab active" data-tab="woman-type">女性像</button>
+            <button class="tab" data-tab="age">年代</button>
+            <button class="tab" data-tab="marital">既婚</button>
+            <button class="tab" data-tab="children">子供の有無</button>
+        </div>
+
+        <div class="tab-content active" id="woman-type">
+            <div class="chart-container">
+                <div class="chart-wrapper">
+                    <canvas id="woman-type-chart"></canvas>
+                </div>
+                <div class="legend" id="woman-type-legend"></div>
             </div>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
-                <div>
-                    <h3 style="font-size: 16px; margin-bottom: 16px; color: var(--text-primary);">年齢層分布</h3>
+        </div>
+
+        <div class="tab-content" id="age">
+            <div class="chart-container">
+                <div class="chart-wrapper">
                     <canvas id="age-chart"></canvas>
                 </div>
-                <div>
-                    <h3 style="font-size: 16px; margin-bottom: 16px; color: var(--text-primary);">職業分布</h3>
-                    <canvas id="occupation-chart"></canvas>
-                </div>
+                <div class="legend" id="age-legend"></div>
             </div>
-        </section>
+        </div>
 
-        <!-- Woman Type Analysis -->
-        <section class="content-section">
-            <div class="section-header">
-                <h2 class="section-title">✨ 女性像分析</h2>
-            </div>
-            <canvas id="woman-type-chart" style="max-height: 300px;"></canvas>
-        </section>
-
-        <!-- Marital & Children Analysis -->
-        <section class="content-section">
-            <div class="section-header">
-                <h2 class="section-title">👨‍👩‍👧‍👦 家族構成分析</h2>
-            </div>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px;">
-                <div>
-                    <h3 style="font-size: 16px; margin-bottom: 16px; color: var(--text-primary);">結婚状態</h3>
+        <div class="tab-content" id="marital">
+            <div class="chart-container">
+                <div class="chart-wrapper">
                     <canvas id="marital-chart"></canvas>
                 </div>
-                <div>
-                    <h3 style="font-size: 16px; margin-bottom: 16px; color: var(--text-primary);">子供の有無</h3>
+                <div class="legend" id="marital-legend"></div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="children">
+            <div class="chart-container">
+                <div class="chart-wrapper">
                     <canvas id="children-chart"></canvas>
                 </div>
+                <div class="legend" id="children-legend"></div>
             </div>
-        </section>
+        </div>
 
-        <!-- Reviews Section -->
-        <section class="content-section">
-            <div class="section-header">
-                <h2 class="section-title">💬 レビュー一覧</h2>
-            </div>
-            <div id="reviews-list" class="reviews-list"></div>
-        </section>
-    </main>
+        <div class="reviews-section">
+            <div class="section-title">あなたの作品へのレビュー</div>
+            <div id="reviews-list"></div>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <a href="#" class="nav-item active">
+            <div class="nav-icon">🎨</div>
+            <div class="nav-label">作品</div>
+        </a>
+        <a href="#" class="nav-item">
+            <div class="nav-icon">📝</div>
+            <div class="nav-label">レビュー</div>
+        </a>
+        <a href="#" class="nav-item">
+            <div class="nav-icon">⭐</div>
+            <div class="nav-label">人気作品</div>
+        </a>
+        <a href="#" class="nav-item">
+            <div class="nav-icon">👤</div>
+            <div class="nav-label">マイページ</div>
+        </a>
+    </div>
 
     <script src="js/hairdresser.js"></script>
 </body>

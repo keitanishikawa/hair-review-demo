@@ -1,11 +1,21 @@
-// Hairdresser Dashboard JavaScript
+// Hairdresser Dashboard JavaScript - Colorful Design
 
 let currentUser = null;
 let myReviews = [];
+let charts = {};
+
+// Colorful color schemes
+const colors = {
+    womanType: ['#FFB6C1', '#FFC0CB', '#C8A2C8', '#9370DB'],  // Pink, Light Pink, Lilac, Purple
+    age: ['#FF9A76', '#FF7979', '#C56CF0', '#6C5CE7', '#A29BFE'],  // Oranges and Purples
+    marital: ['#FF6B9D', '#C44569', '#A8E6CF'],  // Pinks and Green
+    children: ['#4ECDC4', '#FF6B6B', '#95AAB4']  // Teal, Red, Gray
+};
 
 document.addEventListener('DOMContentLoaded', () => {
     checkAuth();
     loadDashboardData();
+    setupTabs();
 });
 
 function checkAuth() {
@@ -22,11 +32,32 @@ function logout() {
     window.location.href = 'login.html';
 }
 
+function setupTabs() {
+    const tabs = document.querySelectorAll('.tab');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            // Remove active class from all tabs and contents
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+            // Add active class to clicked tab
+            tab.classList.add('active');
+
+            // Show corresponding content
+            const tabName = tab.getAttribute('data-tab');
+            document.getElementById(tabName).classList.add('active');
+        });
+    });
+}
+
 function loadDashboardData() {
     // Display user info
     document.getElementById('user-name').textContent = currentUser.name;
     document.getElementById('salon-name').textContent = currentUser.salon;
     document.getElementById('target-age').textContent = currentUser.targetAge || '-';
+
+    // Load and display profile image
+    loadProfileImage();
 
     // Load reviews for this hairdresser's image
     const surveys = JSON.parse(localStorage.getItem('surveys') || '[]');
@@ -34,37 +65,36 @@ function loadDashboardData() {
 
     document.getElementById('review-count').textContent = myReviews.length;
 
-    // Load and display image
-    loadImage();
-
     // Analyze and display data
     if (myReviews.length > 0) {
-        analyzeWomanTypes();
-        createAgeChart();
-        createOccupationChart();
-        createWomanTypeChart();
-        createMaritalChart();
-        createChildrenChart();
-        displayReviews();
+        analyzeAndDisplay();
+    } else {
+        document.querySelector('.main-content').innerHTML += `
+            <div style="text-align: center; padding: 60px 20px; color: #999;">
+                <div style="font-size: 48px; margin-bottom: 16px;">📊</div>
+                <p>まだレビューがありません</p>
+            </div>
+        `;
     }
 }
 
-function loadImage() {
+function loadProfileImage() {
     const images = JSON.parse(localStorage.getItem('images') || '{}');
     const imageData = images[currentUser.imageFile];
 
-    const imgElement = document.getElementById('design-image');
+    const imgElement = document.getElementById('profile-img');
     if (imageData) {
         imgElement.src = imageData;
     } else {
         imgElement.src = `images/${currentUser.imageFile}`;
         imgElement.onerror = function() {
-            this.src = 'https://via.placeholder.com/800x600/706fd3/ffffff?text=ヘアデザイン';
+            this.src = 'https://via.placeholder.com/80/667eea/ffffff?text=' + encodeURIComponent(currentUser.name.charAt(0));
         };
     }
 }
 
-function analyzeWomanTypes() {
+function analyzeAndDisplay() {
+    // Analyze woman types
     const typeCounts = {};
     myReviews.forEach(review => {
         const type = review.womanType || '未回答';
@@ -73,69 +103,15 @@ function analyzeWomanTypes() {
 
     const topType = Object.entries(typeCounts).sort((a, b) => b[1] - a[1])[0];
     if (topType) {
-        document.getElementById('top-woman-type').textContent = topType[0];
+        document.getElementById('top-type').textContent = topType[0];
     }
-}
 
-function createAgeChart() {
-    const ageGroups = {
-        '20代': 0,
-        '30代': 0,
-        '40代': 0,
-        '50代以上': 0
-    };
-
-    myReviews.forEach(review => {
-        const age = parseInt(review.age);
-        if (age >= 20 && age < 30) ageGroups['20代']++;
-        else if (age >= 30 && age < 40) ageGroups['30代']++;
-        else if (age >= 40 && age < 50) ageGroups['40代']++;
-        else if (age >= 50) ageGroups['50代以上']++;
-    });
-
-    const ctx = document.getElementById('age-chart');
-    new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: Object.keys(ageGroups),
-            datasets: [{
-                data: Object.values(ageGroups),
-                backgroundColor: ['#706fd3', '#ff6348', '#2ed573', '#ffa502']
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { position: 'bottom' }
-            }
-        }
-    });
-}
-
-function createOccupationChart() {
-    const occupations = {};
-    myReviews.forEach(review => {
-        const occ = review.occupation || '未回答';
-        occupations[occ] = (occupations[occ] || 0) + 1;
-    });
-
-    const ctx = document.getElementById('occupation-chart');
-    new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: Object.keys(occupations),
-            datasets: [{
-                data: Object.values(occupations),
-                backgroundColor: ['#706fd3', '#ff6348', '#2ed573', '#ffa502', '#5f27cd', '#00d2d3']
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { position: 'bottom' }
-            }
-        }
-    });
+    // Create all charts
+    createWomanTypeChart();
+    createAgeChart();
+    createMaritalChart();
+    createChildrenChart();
+    displayReviews();
 }
 
 function createWomanTypeChart() {
@@ -146,14 +122,13 @@ function createWomanTypeChart() {
     });
 
     const ctx = document.getElementById('woman-type-chart');
-    new Chart(ctx, {
-        type: 'bar',
+    charts.womanType = new Chart(ctx, {
+        type: 'pie',
         data: {
             labels: Object.keys(types),
             datasets: [{
-                label: '回答数',
                 data: Object.values(types),
-                backgroundColor: '#706fd3'
+                backgroundColor: colors.womanType
             }]
         },
         options: {
@@ -161,15 +136,52 @@ function createWomanTypeChart() {
             maintainAspectRatio: true,
             plugins: {
                 legend: { display: false }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: { stepSize: 1 }
-                }
             }
         }
     });
+
+    // Create custom legend
+    createLegend('woman-type-legend', Object.keys(types), colors.womanType);
+}
+
+function createAgeChart() {
+    const ageGroups = {
+        '20〜24歳': 0,
+        '25〜29歳': 0,
+        '30〜34歳': 0,
+        '35〜39歳': 0,
+        '40〜44歳': 0
+    };
+
+    myReviews.forEach(review => {
+        const age = parseInt(review.age);
+        if (age >= 20 && age < 25) ageGroups['20〜24歳']++;
+        else if (age >= 25 && age < 30) ageGroups['25〜29歳']++;
+        else if (age >= 30 && age < 35) ageGroups['30〜34歳']++;
+        else if (age >= 35 && age < 40) ageGroups['35〜39歳']++;
+        else if (age >= 40 && age < 45) ageGroups['40〜44歳']++;
+    });
+
+    const ctx = document.getElementById('age-chart');
+    charts.age = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: Object.keys(ageGroups),
+            datasets: [{
+                data: Object.values(ageGroups),
+                backgroundColor: colors.age
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+
+    createLegend('age-legend', Object.keys(ageGroups), colors.age);
 }
 
 function createMaritalChart() {
@@ -180,22 +192,25 @@ function createMaritalChart() {
     });
 
     const ctx = document.getElementById('marital-chart');
-    new Chart(ctx, {
+    charts.marital = new Chart(ctx, {
         type: 'pie',
         data: {
             labels: Object.keys(marital),
             datasets: [{
                 data: Object.values(marital),
-                backgroundColor: ['#706fd3', '#ff6348', '#95afc0']
+                backgroundColor: colors.marital
             }]
         },
         options: {
             responsive: true,
+            maintainAspectRatio: true,
             plugins: {
-                legend: { position: 'bottom' }
+                legend: { display: false }
             }
         }
     });
+
+    createLegend('marital-legend', Object.keys(marital), colors.marital);
 }
 
 function createChildrenChart() {
@@ -206,46 +221,51 @@ function createChildrenChart() {
     });
 
     const ctx = document.getElementById('children-chart');
-    new Chart(ctx, {
+    charts.children = new Chart(ctx, {
         type: 'pie',
         data: {
             labels: Object.keys(children),
             datasets: [{
                 data: Object.values(children),
-                backgroundColor: ['#2ed573', '#ff6348', '#95afc0']
+                backgroundColor: colors.children
             }]
         },
         options: {
             responsive: true,
+            maintainAspectRatio: true,
             plugins: {
-                legend: { position: 'bottom' }
+                legend: { display: false }
             }
         }
     });
+
+    createLegend('children-legend', Object.keys(children), colors.children);
+}
+
+function createLegend(elementId, labels, colors) {
+    const legendEl = document.getElementById(elementId);
+    legendEl.innerHTML = labels.map((label, i) => `
+        <div class="legend-item">
+            <div class="legend-color" style="background: ${colors[i]}"></div>
+            <span>${label}</span>
+        </div>
+    `).join('');
 }
 
 function displayReviews() {
     const reviewsList = document.getElementById('reviews-list');
 
     if (myReviews.length === 0) {
-        reviewsList.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">まだレビューがありません</p>';
+        reviewsList.innerHTML = '<p style="text-align: center; color: #999;">まだレビューがありません</p>';
         return;
     }
 
-    reviewsList.innerHTML = myReviews.map(review => `
+    reviewsList.innerHTML = myReviews.slice(0, 10).map(review => `
         <div class="review-card">
-            <div class="review-header">
-                <div>
-                    <span style="font-weight: 600;">${review.occupation || '未回答'}</span>
-                    <span style="color: var(--text-secondary); margin-left: 8px;">${review.age}歳</span>
-                    <span style="color: var(--text-secondary); margin-left: 8px;">・</span>
-                    <span style="color: var(--secondary-color); margin-left: 8px;">${review.womanType || '未回答'}</span>
-                </div>
-                <div style="font-size: 12px; color: var(--text-secondary);">
-                    ${review.maritalStatus || '未回答'} / ${review.hasChildren || '未回答'}
-                </div>
+            <div class="review-meta">
+                ${review.age}歳 ${review.gender || ''} ${review.occupation || ''}
             </div>
-            <p class="review-text">${review.comment || 'コメントなし'}</p>
+            <div class="review-text">${review.comment || 'コメントなし'}</div>
         </div>
     `).join('');
 }
