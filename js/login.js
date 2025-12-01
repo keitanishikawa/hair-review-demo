@@ -44,15 +44,41 @@ document.addEventListener('DOMContentLoaded', () => {
         loginBtn.innerHTML = '<span class="btn-text">ログイン中...</span>';
 
         try {
+            // Check for owner/admin accounts first
+            if (email === 'owner@example.com') {
+                const userData = {
+                    name: 'オーナー',
+                    email: email,
+                    role: 'owner'
+                };
+                sessionStorage.setItem('currentUser', JSON.stringify(userData));
+                window.location.href = 'owner_dashboard.html';
+                return;
+            }
+
+            if (email === 'admin@example.com') {
+                const userData = {
+                    name: '管理者',
+                    email: email,
+                    role: 'admin'
+                };
+                sessionStorage.setItem('currentUser', JSON.stringify(userData));
+                window.location.href = 'admin_dashboard.html';
+                return;
+            }
+
+            // Check hairdresser accounts
             const hairdressers = await loadHairdressers();
             const hairdresser = hairdressers.find(h => h.email === email);
 
             if (hairdresser) {
-                // Store user data
+                // Store user data with role
+                hairdresser.role = 'hairdresser';
                 sessionStorage.setItem('currentUser', JSON.stringify(hairdresser));
 
-                // Redirect to dashboard
-                window.location.href = 'dashboard.html';
+                // Redirect to individual dashboard
+                const dashboardPath = 'dashboards/' + email.split('@')[0].replace('.', '_') + '.html';
+                window.location.href = dashboardPath;
             } else {
                 showError('このメールアドレスは登録されていません');
                 loginBtn.disabled = false;

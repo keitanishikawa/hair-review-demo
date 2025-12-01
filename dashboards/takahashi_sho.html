@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>高橋翔 - ダッシュボード | Hair Design Review</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="dashboard-page">
+    <header class="header">
+        <div class="header-content">
+            <div class="header-logo">
+                <span class="logo-text">id</span>
+                <span class="logo-year">2025</span>
+            </div>
+            <div class="header-user">
+                <span class="user-name">高橋翔</span>
+                <button class="logout-btn" onclick="logout()">ログアウト</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <div class="page-header">
+            <h1 class="page-title">ダッシュボード</h1>
+            <p class="page-subtitle">TRUNK SALON - 投稿スタイルの分析とレビュー</p>
+        </div>
+
+        <!-- Stats Section -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">総レビュー数</div>
+                <div class="stat-value">10</div>
+                <div class="stat-change positive">
+                    ↑ 12% 先月比
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">平均評価</div>
+                <div class="stat-value">4.5</div>
+                <div class="stat-change positive">
+                    ↑ 0.3 先月比
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">お気に入り登録</div>
+                <div class="stat-value">30</div>
+                <div class="stat-change positive">
+                    ↑ 24% 先月比
+                </div>
+            </div>
+        </div>
+
+        <!-- Current Design Section -->
+        <section class="content-section">
+            <div class="section-header">
+                <h2 class="section-title">最新の投稿スタイル</h2>
+            </div>
+
+            <div class="design-card">
+                <img
+                    src="../images/hair_design_005.jpg"
+                    alt="ヘアスタイル"
+                    class="design-image"
+                    onerror="this.src='https://via.placeholder.com/800x600/706fd3/ffffff?text=ヘアデザイン'"
+                >
+                <div class="design-info">
+                    <div class="design-meta">
+                        <div class="design-date">投稿日: 2025年12月1日</div>
+                        <span class="design-status active">レビュー受付中</span>
+                    </div>
+
+                    <div class="design-stats">
+                        <div class="design-stat">
+                            <div class="design-stat-value">10</div>
+                            <div class="design-stat-label">レビュー数</div>
+                        </div>
+                        <div class="design-stat">
+                            <div class="design-stat-value">4.5</div>
+                            <div class="design-stat-label">平均評価</div>
+                        </div>
+                        <div class="design-stat">
+                            <div class="design-stat-value">30</div>
+                            <div class="design-stat-label">お気に入り</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Reviews Section -->
+        <section class="content-section">
+            <div class="section-header">
+                <h2 class="section-title">最近のレビュー (10件)</h2>
+            </div>
+
+            <div class="reviews-list">
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-rating">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                        </div>
+                        <div class="review-date">アルバイト (43歳)</div>
+                    </div>
+                    <p class="review-text">
+                        ナチュラルな雰囲気が普段使いしやすそうで良い
+                    </p>
+                </div>
+
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-rating">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                        </div>
+                        <div class="review-date">アルバイト (41歳)</div>
+                    </div>
+                    <p class="review-text">
+                        ストレートでシンプルだけど洗練された印象
+                    </p>
+                </div>
+
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-rating">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                        </div>
+                        <div class="review-date">自営業 (34歳)</div>
+                    </div>
+                    <p class="review-text">
+                        ツヤ感のある髪質表現が美しいと感じました
+                    </p>
+                </div>
+
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-rating">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                        </div>
+                        <div class="review-date">パート (43歳)</div>
+                    </div>
+                    <p class="review-text">
+                        シンプルながらも上品さを感じるデザイン
+                    </p>
+                </div>
+
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-rating">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                        </div>
+                        <div class="review-date">パート (26歳)</div>
+                    </div>
+                    <p class="review-text">
+                        ストレートでシンプルだけど洗練された印象
+                    </p>
+                </div>
+
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-rating">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                        </div>
+                        <div class="review-date">会社員 (30歳)</div>
+                    </div>
+                    <p class="review-text">
+                        セミロングの長さとカールのバランスが絶妙
+                    </p>
+                </div>
+
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-rating">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                        </div>
+                        <div class="review-date">会社員 (43歳)</div>
+                    </div>
+                    <p class="review-text">
+                        自分には似合わないヘアスタイルだが、画像のモデルさんの顔立ちや雰囲気には合っていると思った
+                    </p>
+                </div>
+
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-rating">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                        </div>
+                        <div class="review-date">自営業 (42歳)</div>
+                    </div>
+                    <p class="review-text">
+                        明るい髪色が顔色を明るく見せてくれそう
+                    </p>
+                </div>
+
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-rating">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                        </div>
+                        <div class="review-date">自営業 (38歳)</div>
+                    </div>
+                    <p class="review-text">
+                        ふんわりとしたカールが女性らしくて好きです
+                    </p>
+                </div>
+
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-rating">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                        </div>
+                        <div class="review-date">パート (33歳)</div>
+                    </div>
+                    <p class="review-text">
+                        明るいカラーと軽やかなスタイルが春夏にぴったり
+                    </p>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Stylist Info Section -->
+        <section class="content-section">
+            <div class="section-header">
+                <h2 class="section-title">美容師情報</h2>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                <div>
+                    <div style="font-size: 14px; color: #5f5f79; margin-bottom: 4px;">お名前</div>
+                    <div style="font-size: 16px; font-weight: 600; color: #2c2c54;">高橋翔</div>
+                </div>
+                <div>
+                    <div style="font-size: 14px; color: #5f5f79; margin-bottom: 4px;">フリガナ</div>
+                    <div style="font-size: 16px; font-weight: 600; color: #2c2c54;">タカハシショウ</div>
+                </div>
+                <div>
+                    <div style="font-size: 14px; color: #5f5f79; margin-bottom: 4px;">店舗名</div>
+                    <div style="font-size: 16px; font-weight: 600; color: #2c2c54;">TRUNK SALON</div>
+                </div>
+                <div>
+                    <div style="font-size: 14px; color: #5f5f79; margin-bottom: 4px;">メールアドレス</div>
+                    <div style="font-size: 16px; font-weight: 600; color: #2c2c54;">takahashi.sho@example.com</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="../js/dashboard.js"></script>
+</body>
+</html>

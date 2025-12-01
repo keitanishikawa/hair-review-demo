@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理者ダッシュボード | Hair Design Review</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .admin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .admin-card {
+            background: var(--bg-white);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            border-left: 4px solid var(--secondary-color);
+            transition: all 0.3s ease;
+        }
+
+        .admin-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .admin-card-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .admin-card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .admin-card-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--secondary-color);
+            margin-bottom: 8px;
+        }
+
+        .admin-card-description {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .system-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .system-status.online {
+            background: #d4f4dd;
+            color: var(--success-color);
+        }
+
+        .system-status.warning {
+            background: #fff3e0;
+            color: var(--warning-color);
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .activity-log {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .activity-item {
+            padding: 12px;
+            border-left: 3px solid var(--border-color);
+            margin-bottom: 12px;
+            background: var(--bg-light);
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .activity-item:hover {
+            border-left-color: var(--secondary-color);
+            background: white;
+        }
+
+        .activity-time {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .activity-text {
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        .action-button {
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+            background: var(--secondary-color);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        .action-button:hover {
+            background: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .action-button.danger {
+            background: var(--danger-color);
+        }
+
+        .action-button.success {
+            background: var(--success-color);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .data-table th {
+            background: var(--bg-light);
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .data-table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .data-table tr:hover {
+            background: var(--bg-light);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge.active {
+            background: #d4f4dd;
+            color: var(--success-color);
+        }
+
+        .badge.inactive {
+            background: #ffe0e0;
+            color: var(--danger-color);
+        }
+
+        .badge.pending {
+            background: #fff3e0;
+            color: var(--warning-color);
+        }
+    </style>
+</head>
+<body class="dashboard-page">
+    <header class="header">
+        <div class="header-content">
+            <div class="header-logo">
+                <span class="logo-text">id</span>
+                <span class="logo-year">2025</span>
+            </div>
+            <div class="header-user">
+                <span class="user-name">⚙️ システム管理者</span>
+                <button class="logout-btn" onclick="logout()">ログアウト</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <div class="page-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1 class="page-title">管理者ダッシュボード</h1>
+                <p class="page-subtitle">システム全体の監視と管理</p>
+            </div>
+            <div class="system-status online">
+                <span class="status-indicator"></span>
+                システム正常稼働中
+            </div>
+        </div>
+
+        <!-- System Overview Cards -->
+        <div class="admin-grid">
+            <div class="admin-card">
+                <div class="admin-card-icon">👥</div>
+                <div class="admin-card-title">登録ユーザー数</div>
+                <div class="admin-card-value">110</div>
+                <div class="admin-card-description">美容師10名 + 一般ユーザー100名</div>
+            </div>
+            <div class="admin-card">
+                <div class="admin-card-icon">💬</div>
+                <div class="admin-card-title">総レビュー数</div>
+                <div class="admin-card-value">100</div>
+                <div class="admin-card-description">先月比 +15%</div>
+            </div>
+            <div class="admin-card">
+                <div class="admin-card-icon">📊</div>
+                <div class="admin-card-title">システム稼働率</div>
+                <div class="admin-card-value">99.9%</div>
+                <div class="admin-card-description">過去30日間の平均</div>
+            </div>
+            <div class="admin-card">
+                <div class="admin-card-icon">💾</div>
+                <div class="admin-card-title">データベース容量</div>
+                <div class="admin-card-value">2.4GB</div>
+                <div class="admin-card-description">使用率: 24% / 10GB</div>
+            </div>
+        </div>
+
+        <!-- Quick Actions Section -->
+        <section class="content-section">
+            <div class="section-header">
+                <h2 class="section-title">🚀 クイックアクション</h2>
+            </div>
+            <div>
+                <button class="action-button">新規ユーザー登録</button>
+                <button class="action-button">CSVエクスポート</button>
+                <button class="action-button">バックアップ実行</button>
+                <button class="action-button success">システムチェック</button>
+                <button class="action-button">メール送信</button>
+                <button class="action-button danger">キャッシュクリア</button>
+            </div>
+        </section>
+
+        <!-- User Management Section -->
+        <section class="content-section">
+            <div class="section-header">
+                <h2 class="section-title">👥 ユーザー管理</h2>
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>ユーザー名</th>
+                        <th>メールアドレス</th>
+                        <th>役割</th>
+                        <th>ステータス</th>
+                        <th>登録日</th>
+                        <th>最終ログイン</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>#001</td>
+                        <td><strong>伊藤潤</strong></td>
+                        <td>ito.jun@example.com</td>
+                        <td>美容師</td>
+                        <td><span class="badge active">有効</span></td>
+                        <td>2025-01-15</td>
+                        <td>2025-12-01 10:30</td>
+                    </tr>
+                    <tr>
+                        <td>#002</td>
+                        <td><strong>佐藤美咲</strong></td>
+                        <td>sato.misaki@example.com</td>
+                        <td>美容師</td>
+                        <td><span class="badge active">有効</span></td>
+                        <td>2025-01-16</td>
+                        <td>2025-12-01 09:15</td>
+                    </tr>
+                    <tr>
+                        <td>#003</td>
+                        <td><strong>田中健太</strong></td>
+                        <td>tanaka.kenta@example.com</td>
+                        <td>美容師</td>
+                        <td><span class="badge active">有効</span></td>
+                        <td>2025-01-17</td>
+                        <td>2025-11-30 16:45</td>
+                    </tr>
+                    <tr>
+                        <td>#004</td>
+                        <td><strong>鈴木愛</strong></td>
+                        <td>suzuki.ai@example.com</td>
+                        <td>美容師</td>
+                        <td><span class="badge active">有効</span></td>
+                        <td>2025-01-18</td>
+                        <td>2025-11-30 14:20</td>
+                    </tr>
+                    <tr>
+                        <td>#005</td>
+                        <td><strong>オーナーアカウント</strong></td>
+                        <td>owner@example.com</td>
+                        <td>オーナー</td>
+                        <td><span class="badge active">有効</span></td>
+                        <td>2025-01-01</td>
+                        <td>2025-12-01 08:00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Activity Log Section -->
+        <section class="content-section">
+            <div class="section-header">
+                <h2 class="section-title">📋 アクティビティログ</h2>
+            </div>
+            <div class="activity-log">
+                <div class="activity-item">
+                    <div class="activity-time">2025-12-01 10:35</div>
+                    <div class="activity-text">✅ 伊藤潤さんがログインしました</div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-time">2025-12-01 10:30</div>
+                    <div class="activity-text">💬 新しいレビューが投稿されました (hair_design_001.jpg)</div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-time">2025-12-01 09:15</div>
+                    <div class="activity-text">✅ 佐藤美咲さんがログインしました</div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-time">2025-12-01 08:45</div>
+                    <div class="activity-text">💬 新しいレビューが投稿されました (hair_design_002.jpg)</div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-time">2025-12-01 08:00</div>
+                    <div class="activity-text">✅ オーナーアカウントがログインしました</div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-time">2025-11-30 23:00</div>
+                    <div class="activity-text">🔄 自動バックアップが完了しました</div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-time">2025-11-30 20:30</div>
+                    <div class="activity-text">💬 新しいレビューが投稿されました (hair_design_005.jpg)</div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-time">2025-11-30 18:15</div>
+                    <div class="activity-text">✅ 山本咲良さんがログインしました</div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-time">2025-11-30 16:45</div>
+                    <div class="activity-text">✅ 田中健太さんがログインしました</div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-time">2025-11-30 15:20</div>
+                    <div class="activity-text">💬 新しいレビューが投稿されました (hair_design_008.jpg)</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- System Stats Section -->
+        <section class="content-section">
+            <div class="section-header">
+                <h2 class="section-title">📈 システム統計</h2>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                <div style="padding: 16px; background: var(--bg-light); border-radius: 8px;">
+                    <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 4px;">APIリクエスト数 (今日)</div>
+                    <div style="font-size: 24px; font-weight: 700; color: var(--primary-color);">1,247</div>
+                </div>
+                <div style="padding: 16px; background: var(--bg-light); border-radius: 8px;">
+                    <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 4px;">平均応答時間</div>
+                    <div style="font-size: 24px; font-weight: 700; color: var(--primary-color);">85ms</div>
+                </div>
+                <div style="padding: 16px; background: var(--bg-light); border-radius: 8px;">
+                    <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 4px;">エラー率</div>
+                    <div style="font-size: 24px; font-weight: 700; color: var(--success-color);">0.02%</div>
+                </div>
+                <div style="padding: 16px; background: var(--bg-light); border-radius: 8px;">
+                    <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 4px;">アクティブセッション</div>
+                    <div style="font-size: 24px; font-weight: 700; color: var(--primary-color);">23</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="js/dashboard.js"></script>
+</body>
+</html>
