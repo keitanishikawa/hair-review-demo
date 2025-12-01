@@ -309,6 +309,7 @@ function detectColumnMapping(headers, expectedFields) {
 
 // Preview hairdresser data in table format
 let parsedHairdresserData = null;
+let hairdresserColumnMapping = {};
 
 function previewHairdresserData() {
     const textarea = document.getElementById('hairdresser-data');
@@ -361,19 +362,33 @@ function displayHairdresserPreview(results) {
     const headers = results.meta.fields || Object.keys(results.data[0] || {});
     const mapping = detectColumnMapping(headers, expectedFields);
 
-    // Display mapping info
-    let mappingHtml = '<div style="background: #f0f4ff; padding: 12px; border-radius: 8px; margin-bottom: 16px; font-size: 13px;">';
-    mappingHtml += '<strong>📍 列のマッピング:</strong> ';
-    const mappingItems = [];
+    // Initialize manual mapping if not set
+    if (Object.keys(hairdresserColumnMapping).length === 0) {
+        expectedFields.forEach(field => {
+            hairdresserColumnMapping[field.name] = mapping[field.name] || '';
+        });
+    }
+
+    // Display manual mapping editor
+    let mappingHtml = '<div style="background: #fff3cd; padding: 16px; border-radius: 8px; margin-bottom: 16px; border: 2px solid #ffc107;">';
+    mappingHtml += '<div style="font-weight: bold; margin-bottom: 12px; color: #856404;">⚙️ 列のマッピング設定（手動調整可能）</div>';
+    mappingHtml += '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px;">';
+
     expectedFields.forEach(field => {
-        const mappedHeader = mapping[field.name];
-        if (mappedHeader) {
-            mappingItems.push(`<span style="color: #2ecc71;">✓ ${field.name} ← "${mappedHeader}"</span>`);
-        } else {
-            mappingItems.push(`<span style="color: #ff6b6b;">✗ ${field.name} (見つかりません)</span>`);
-        }
+        mappingHtml += '<div style="display: flex; align-items: center; gap: 8px;">';
+        mappingHtml += `<span style="font-weight: 500; min-width: 120px;">${field.name}:</span>`;
+        mappingHtml += `<select id="mapping-hairdresser-${field.name}" onchange="updateHairdresserMapping('${field.name}', this.value)" style="flex: 1; padding: 6px; border: 1px solid #ccc; border-radius: 4px;">`;
+        mappingHtml += '<option value="">-- 選択してください --</option>';
+        headers.forEach(h => {
+            const selected = hairdresserColumnMapping[field.name] === h ? 'selected' : '';
+            mappingHtml += `<option value="${h}" ${selected}>${h}</option>`;
+        });
+        mappingHtml += '</select>';
+        mappingHtml += '</div>';
     });
-    mappingHtml += mappingItems.join(' | ');
+
+    mappingHtml += '</div>';
+    mappingHtml += '<button onclick="applyHairdresserMapping()" style="margin-top: 12px; padding: 8px 16px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">✓ マッピングを適用してプレビュー更新</button>';
     mappingHtml += '</div>';
 
     const headers_display = ['氏名', 'サロン名', 'メールアドレス', 'ターゲット年齢', '画像ファイル名'];
@@ -389,11 +404,11 @@ function displayHairdresserPreview(results) {
     results.data.forEach((row, i) => {
         const bgColor = i % 2 === 0 ? '#f8f9fa' : '#ffffff';
         html += `<tr style="background: ${bgColor};">`;
-        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${findColumn(row, ['氏名', '名前', 'name', '姓名']) || '-'}</td>`;
-        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${findColumn(row, ['サロン名', '店名', 'salon', 'サロン', 'shop', 'store', '店舗名']) || '-'}</td>`;
-        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${findColumn(row, ['メールアドレス', 'メール', 'email', 'mail', 'e-mail']) || '-'}</td>`;
-        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${findColumn(row, ['ターゲット年齢', 'ターゲット', 'target_age', 'target', '年齢層']) || '-'}</td>`;
-        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0; font-family: monospace; font-size: 12px;">${findColumn(row, ['画像ファイル名', '画像', 'image_file', 'imageFile', 'ファイル名', 'file']) || '-'}</td>`;
+        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${row[hairdresserColumnMapping['氏名']] || findColumn(row, ['氏名', '名前', 'name', '姓名']) || '-'}</td>`;
+        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${row[hairdresserColumnMapping['サロン名']] || findColumn(row, ['サロン名', '店名', 'salon', 'サロン', 'shop', 'store', '店舗名']) || '-'}</td>`;
+        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${row[hairdresserColumnMapping['メールアドレス']] || findColumn(row, ['メールアドレス', 'メール', 'email', 'mail', 'e-mail']) || '-'}</td>`;
+        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${row[hairdresserColumnMapping['ターゲット年齢']] || findColumn(row, ['ターゲット年齢', 'ターゲット', 'target_age', 'target', '年齢層']) || '-'}</td>`;
+        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0; font-family: monospace; font-size: 12px;">${row[hairdresserColumnMapping['画像ファイル名']] || findColumn(row, ['画像ファイル名', '画像', 'image_file', 'imageFile', 'ファイル名', 'file']) || '-'}</td>`;
         html += '</tr>';
     });
 
@@ -401,6 +416,15 @@ function displayHairdresserPreview(results) {
     table.innerHTML = html;
     countSpan.textContent = results.data.length;
     previewDiv.style.display = 'block';
+}
+
+function updateHairdresserMapping(field, column) {
+    hairdresserColumnMapping[field] = column;
+}
+
+function applyHairdresserMapping() {
+    // Re-render preview with updated mapping
+    displayHairdresserPreview(parsedHairdresserData);
 }
 
 function confirmHairdresserData() {
