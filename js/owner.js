@@ -4,6 +4,15 @@ let hairdressers = [];
 let allSurveys = [];
 let staffStats = [];
 let allCharts = {};
+let staffImages = {};
+
+// Color Palette - Purple Gradient Theme
+const COLOR_PALETTE = {
+    primary: ['#667eea', '#764ba2', '#9b59b6', '#8e44ad'],
+    gradient: ['#667eea', '#764ba2', '#f093fb', '#f5576c'],
+    accent: ['#f093fb', '#ff6b9d', '#ffa8a8', '#20e3b2'],
+    full: ['#667eea', '#764ba2', '#9b59b6', '#f093fb', '#ff6b9d', '#20e3b2', '#feca57']
+};
 
 document.addEventListener('DOMContentLoaded', () => {
     checkAuth();
@@ -57,10 +66,12 @@ function loadOwnerDashboard() {
     // Load data from localStorage
     hairdressers = JSON.parse(localStorage.getItem('hairdressers') || '[]');
     allSurveys = JSON.parse(localStorage.getItem('surveys') || '[]');
+    staffImages = JSON.parse(localStorage.getItem('images') || '{}');
 
     console.log('🔍 オーナーダッシュボード - データ読み込み結果:');
     console.log('- 美容師数:', hairdressers.length);
     console.log('- アンケート数:', allSurveys.length);
+    console.log('- 画像数:', Object.keys(staffImages).length);
 
     if (hairdressers.length === 0) {
         document.querySelector('.main-container').innerHTML = `
@@ -175,7 +186,7 @@ function createOverallAgeChart() {
             labels: Object.keys(ageGroups),
             datasets: [{
                 data: Object.values(ageGroups),
-                backgroundColor: ['#706fd3', '#ff6348', '#2ed573', '#ffa502']
+                backgroundColor: COLOR_PALETTE.gradient
             }]
         },
         options: {
@@ -195,6 +206,10 @@ function createHairdresserComparisonChart() {
 
     const ctx = document.getElementById('hairdresser-comparison-chart');
     if (allCharts['comparison']) allCharts['comparison'].destroy();
+
+    // Create gradient colors for each bar
+    const colors = reviewCounts.map((_, i) => COLOR_PALETTE.primary[i % COLOR_PALETTE.primary.length]);
+
     allCharts['comparison'] = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -202,7 +217,7 @@ function createHairdresserComparisonChart() {
             datasets: [{
                 label: 'レビュー数',
                 data: reviewCounts.map(r => r.count),
-                backgroundColor: '#706fd3'
+                backgroundColor: colors
             }]
         },
         options: {
@@ -228,17 +243,24 @@ function displayStaffCards() {
     if (!grid) return;
 
     const cards = staffStats.map(staff => {
+        const imageUrl = staffImages[staff.imageFile] || '';
         const initials = staff.name.substring(0, 2);
         const ageDiffDisplay = staff.ageDiff > 0 ? `+${staff.ageDiff}歳` : `${staff.ageDiff}歳`;
-        const ageDiffColor = Math.abs(staff.ageDiff) > 5 ? '#ff6348' : '#2ed573';
+        const ageDiffColor = Math.abs(staff.ageDiff) > 5 ? '#f5576c' : '#20e3b2';
+
+        // Avatar with image or initials fallback
+        const avatarHtml = imageUrl
+            ? `<div class="staff-avatar" style="background-image: url('${imageUrl}'); background-size: cover; background-position: center;"></div>`
+            : `<div class="staff-avatar">${initials}</div>`;
 
         return `
-            <div class="staff-card">
+            <div class="staff-card" onclick="showStaffDetail('${staff.email}')" style="cursor: pointer;">
                 <div class="staff-header">
-                    <div class="staff-avatar">${initials}</div>
+                    ${avatarHtml}
                     <div class="staff-info">
-                        <div class="staff-name">${staff.name} (${staff.avgAge}歳)</div>
+                        <div class="staff-name">${staff.name}</div>
                         <div class="staff-salon">${staff.salon}</div>
+                        <div class="staff-age">平均 ${staff.avgAge}歳</div>
                     </div>
                 </div>
                 <div class="staff-metrics">
@@ -278,6 +300,131 @@ function displayStaffCards() {
     }).join('');
 
     grid.innerHTML = cards;
+}
+
+// Staff Detail View
+function showStaffDetail(staffEmail) {
+    const staff = staffStats.find(s => s.email === staffEmail);
+    if (!staff) return;
+
+    // Create detailed analysis view
+    const modal = document.createElement('div');
+    modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; overflow-y: auto;';
+    modal.onclick = (e) => {
+        if (e.target === modal) modal.remove();
+    };
+
+    const imageUrl = staffImages[staff.imageFile] || '';
+    const initials = staff.name.substring(0, 2);
+    const ageDiffDisplay = staff.ageDiff > 0 ? `+${staff.ageDiff}歳` : `${staff.ageDiff}歳`;
+    const ageDiffColor = Math.abs(staff.ageDiff) > 5 ? '#f5576c' : '#20e3b2';
+
+    // Calculate satisfaction score (based on review count and age match)
+    const satisfactionScore = Math.min(100, (staff.reviewCount * 5) + (10 - Math.abs(staff.ageDiff)) * 3);
+
+    // Age distribution
+    const ageDistribution = {};
+    staff.reviews.forEach(r => {
+        const ageGroup = Math.floor(parseInt(r.age) / 10) * 10;
+        const key = `${ageGroup}代`;
+        ageDistribution[key] = (ageDistribution[key] || 0) + 1;
+    });
+
+    const avatarHtml = imageUrl
+        ? `<div style="width: 80px; height: 80px; border-radius: 50%; background-image: url('${imageUrl}'); background-size: cover; background-position: center; border: 3px solid white; box-shadow: 0 4px 8px rgba(0,0,0,0.2);"></div>`
+        : `<div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 28px; font-weight: bold; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">${initials}</div>`;
+
+    modal.innerHTML = `
+        <div style="background: white; border-radius: 20px; max-width: 900px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 32px; border-radius: 20px 20px 0 0; color: white; position: relative;">
+                <button onclick="this.closest('div').parentElement.parentElement.remove()" style="position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.2); border: none; color: white; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center;">×</button>
+                <div style="display: flex; align-items: center; gap: 24px;">
+                    ${avatarHtml}
+                    <div>
+                        <h2 style="font-size: 28px; margin-bottom: 8px;">${staff.name}</h2>
+                        <p style="font-size: 16px; opacity: 0.9; margin-bottom: 4px;">${staff.salon}</p>
+                        <p style="font-size: 14px; opacity: 0.8;">ターゲット: ${staff.targetAge || '-'}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div style="padding: 32px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 32px;">
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 12px; text-align: center;">
+                        <div style="font-size: 32px; font-weight: 700; margin-bottom: 4px;">${staff.reviewCount}</div>
+                        <div style="font-size: 13px; opacity: 0.9;">レビュー数</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 20px; border-radius: 12px; text-align: center;">
+                        <div style="font-size: 32px; font-weight: 700; margin-bottom: 4px;">${staff.avgAge}歳</div>
+                        <div style="font-size: 13px; opacity: 0.9;">平均年齢</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #20e3b2 0%, #2ed573 100%); color: white; padding: 20px; border-radius: 12px; text-align: center;">
+                        <div style="font-size: 32px; font-weight: 700; margin-bottom: 4px;">${satisfactionScore}</div>
+                        <div style="font-size: 13px; opacity: 0.9;">満足度スコア</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #feca57 0%, #ff9ff3 100%); color: white; padding: 20px; border-radius: 12px; text-align: center;">
+                        <div style="font-size: 24px; font-weight: 700; margin-bottom: 4px; color: ${ageDiffColor};">${ageDiffDisplay}</div>
+                        <div style="font-size: 13px; opacity: 0.9;">年齢差</div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+                    <div style="background: #f8f9fc; padding: 20px; border-radius: 12px;">
+                        <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 16px; color: #667eea;">👥 顧客属性</h3>
+                        <div style="display: grid; gap: 12px;">
+                            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">
+                                <span style="color: #666;">既婚者数</span>
+                                <span style="font-weight: 600; color: #667eea;">${staff.marriedCount}人</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">
+                                <span style="color: #666;">子供あり</span>
+                                <span style="font-weight: 600; color: #667eea;">${staff.hasChildrenCount}人</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">
+                                <span style="color: #666;">人気スタイル</span>
+                                <span style="font-weight: 600; color: #667eea;">${staff.popularStyle}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: #666;">主な職業</span>
+                                <span style="font-weight: 600; color: #667eea;">${staff.popularOccupation}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="background: #f8f9fc; padding: 20px; border-radius: 12px;">
+                        <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 16px; color: #667eea;">📊 年齢層カバレッジ</h3>
+                        <div style="display: grid; gap: 8px;">
+                            ${Object.entries(ageDistribution).map(([age, count]) => `
+                                <div>
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 13px;">
+                                        <span style="color: #666;">${age}</span>
+                                        <span style="font-weight: 600; color: #667eea;">${count}人</span>
+                                    </div>
+                                    <div style="background: #e0e0e0; height: 6px; border-radius: 3px; overflow: hidden;">
+                                        <div style="background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); height: 100%; width: ${(count / staff.reviewCount) * 100}%;"></div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background: #f0f4ff; padding: 20px; border-radius: 12px; border-left: 4px solid #667eea;">
+                    <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 12px; color: #667eea;">📈 分析サマリー</h3>
+                    <p style="color: #666; line-height: 1.6; margin: 0;">
+                        ${staff.name}さんは<strong style="color: #667eea;">${staff.reviewCount}件のレビュー</strong>を獲得しており、
+                        顧客の平均年齢は<strong style="color: #667eea;">${staff.avgAge}歳</strong>です。
+                        ターゲット年齢との差は<strong style="color: ${ageDiffColor};">${ageDiffDisplay}</strong>で、
+                        ${Math.abs(staff.ageDiff) <= 5 ? '理想的なターゲティングができています。' : '若干のズレがあります。マーケティング戦略の見直しを検討してください。'}
+                        主なスタイルは<strong style="color: #667eea;">${staff.popularStyle}</strong>で、
+                        <strong style="color: #667eea;">${staff.popularOccupation}</strong>の顧客に人気です。
+                    </p>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
 }
 
 function populateSalonFilter() {
@@ -434,8 +581,7 @@ function createRadarChart(staffList) {
     if (allCharts['radar']) allCharts['radar'].destroy();
 
     const datasets = staffList.map((staff, index) => {
-        const colors = ['#706fd3', '#ff6348', '#2ed573', '#ffa502'];
-        const color = colors[index % colors.length];
+        const color = COLOR_PALETTE.gradient[index % COLOR_PALETTE.gradient.length];
 
         return {
             label: staff.name,
@@ -564,7 +710,7 @@ function createDemographicsCharts(surveys) {
             labels: Object.keys(ageGroups),
             datasets: [{
                 data: Object.values(ageGroups),
-                backgroundColor: '#706fd3'
+                backgroundColor: COLOR_PALETTE.primary
             }]
         },
         options: {
@@ -589,7 +735,7 @@ function createDemographicsCharts(surveys) {
             labels: Object.keys(occupations),
             datasets: [{
                 data: Object.values(occupations),
-                backgroundColor: ['#706fd3', '#9b59b6', '#ff6348', '#ffa8a8', '#2ed573', '#20e3b2']
+                backgroundColor: COLOR_PALETTE.full
             }]
         },
         options: {
@@ -614,7 +760,7 @@ function createDemographicsCharts(surveys) {
             labels: Object.keys(maritalStatus),
             datasets: [{
                 data: Object.values(maritalStatus),
-                backgroundColor: ['#706fd3', '#ff6b9d']
+                backgroundColor: ['#667eea', '#ff6b9d']
             }]
         },
         options: {
@@ -639,7 +785,7 @@ function createDemographicsCharts(surveys) {
             labels: Object.keys(children),
             datasets: [{
                 data: Object.values(children),
-                backgroundColor: ['#706fd3', '#ffa8a8']
+                backgroundColor: ['#764ba2', '#ffa8a8']
             }]
         },
         options: {
@@ -660,11 +806,10 @@ function createDemographicsCharts(surveys) {
 
     const womanTypes = [...new Set(surveys.map(s => s.womanType).filter(Boolean))];
     const datasets = womanTypes.map((type, index) => {
-        const colors = ['#ff6b9d', '#ffa8a8', '#20e3b2', '#706fd3', '#9b59b6', '#ffa502'];
         return {
             label: type,
             data: Object.keys(crossData).map(occ => crossData[occ][type] || 0),
-            backgroundColor: colors[index % colors.length]
+            backgroundColor: COLOR_PALETTE.full[index % COLOR_PALETTE.full.length]
         };
     });
 
