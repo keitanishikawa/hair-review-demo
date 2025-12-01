@@ -112,18 +112,16 @@ function loadSurveyList() {
 
     listEl.innerHTML = latestSurveys.map((s, i) => `
         <div style="padding: 16px; border-bottom: 1px solid #f0f0f0;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
                 <span style="font-weight: 600; color: #667eea;">🖼️ ${s.imageFile || '画像なし'}</span>
                 <span style="font-size: 12px; color: #999;">#${i + 1}</span>
             </div>
-            <div style="font-size: 14px; color: #333; margin-bottom: 8px; line-height: 1.6;">
-                💬 ${s.comment || 'コメントなし'}
-            </div>
-            <div style="display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px; color: #666;">
-                <span>👤 ${s.occupation || '-'} (${s.age || '-'}歳, ${s.gender || '-'})</span>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap; font-size: 13px; color: #666;">
+                <span>📍 ${s.prefecture || '-'}</span>
+                <span>👤 ${s.age || '-'}歳 ${s.gender || '-'}</span>
+                <span>💼 ${s.occupation || '-'}</span>
                 <span>💍 ${s.maritalStatus || '-'}</span>
-                <span>👶 子供: ${s.hasChildren || '-'}</span>
-                <span>✨ ${s.womanType || '-'}</span>
+                <span>👶 ${s.hasChildren || '-'}</span>
             </div>
         </div>
     `).join('');
@@ -232,19 +230,22 @@ function handleSurveyCSV(file) {
     Papa.parse(file, {
         header: true,
         encoding: 'UTF-8',
+        skipEmptyLines: true,
         complete: (results) => {
             try {
+                console.log('📊 Survey CSV Headers:', results.meta.fields);
+                console.log('📊 Sample Row:', results.data[0]);
+
                 const surveys = results.data
-                    .filter(row => row.選択した画像ファイル || row.image_file)
+                    .filter(row => row.画像ファイル名 || row.imageFile)
                     .map(row => ({
-                        imageFile: row.選択した画像ファイル || row.image_file || '',
-                        occupation: row.職業 || row.occupation || '',
                         age: row.年齢 || row.age || '',
+                        prefecture: row.都道府県 || row.prefecture || '',
                         gender: row.性別 || row.gender || '',
-                        hasChildren: row.子供の有無 || row.has_children || '',
-                        maritalStatus: row.結婚状態 || row.marital_status || '',
-                        womanType: row.女性像 || row.woman_type || '',
-                        comment: row.コメント || row.comment || ''
+                        maritalStatus: row.結婚 || row.marital_status || row.結婚状態 || '',
+                        occupation: row.職業 || row.occupation || '',
+                        hasChildren: row.子供有無 || row.has_children || row.子供の有無 || '',
+                        imageFile: row.画像ファイル名 || row.imageFile || row.選択した画像ファイル || ''
                     }));
 
                 if (surveys.length === 0) {
@@ -252,6 +253,7 @@ function handleSurveyCSV(file) {
                     return;
                 }
 
+                console.log(`✅ ${surveys.length}件のアンケートデータを解析しました`);
                 localStorage.setItem('surveys', JSON.stringify(surveys));
                 showMessage('survey-success', `${surveys.length}件のアンケートデータを登録しました`, true);
                 loadSystemStatus();

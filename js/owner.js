@@ -65,44 +65,9 @@ function loadOwnerDashboard() {
     document.getElementById('avg-reviews').textContent = Math.round(allSurveys.length / hairdressers.length);
 
     // Create charts
-    createOverallWomanTypeChart();
     createOverallAgeChart();
     createHairdresserComparisonChart();
     displayHairdresserCards();
-}
-
-function createOverallWomanTypeChart() {
-    const types = {};
-    allSurveys.forEach(survey => {
-        const type = survey.womanType || '未回答';
-        types[type] = (types[type] || 0) + 1;
-    });
-
-    const ctx = document.getElementById('overall-woman-type-chart');
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: Object.keys(types),
-            datasets: [{
-                label: '回答数',
-                data: Object.values(types),
-                backgroundColor: '#706fd3'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            plugins: {
-                legend: { display: false }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: { stepSize: 1 }
-                }
-            }
-        }
-    });
 }
 
 function createOverallAgeChart() {
@@ -184,14 +149,9 @@ function displayHairdresserCards() {
         const reviews = allSurveys.filter(s => s.imageFile === hairdresser.imageFile);
         const reviewCount = reviews.length;
 
-        // Get top woman type
-        const types = {};
-        reviews.forEach(r => {
-            const type = r.womanType || '未回答';
-            types[type] = (types[type] || 0) + 1;
-        });
-        const topType = Object.entries(types).sort((a, b) => b[1] - a[1])[0];
-        const topWomanType = topType ? topType[0] : '-';
+        // Calculate average age
+        const totalAge = reviews.reduce((sum, r) => sum + (parseInt(r.age) || 0), 0);
+        const avgAge = reviewCount > 0 ? Math.round(totalAge / reviewCount) : 0;
 
         return `
             <div class="hairdresser-card">
@@ -206,8 +166,8 @@ function displayHairdresserCards() {
                         <div class="hairdresser-stat-label">レビュー</div>
                     </div>
                     <div class="hairdresser-stat">
-                        <div class="hairdresser-stat-value" style="font-size: 16px;">${topWomanType}</div>
-                        <div class="hairdresser-stat-label">最多像</div>
+                        <div class="hairdresser-stat-value" style="font-size: 16px;">${avgAge}歳</div>
+                        <div class="hairdresser-stat-label">平均年齢</div>
                     </div>
                 </div>
             </div>

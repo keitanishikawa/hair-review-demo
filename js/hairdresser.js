@@ -94,54 +94,16 @@ function loadProfileImage() {
 }
 
 function analyzeAndDisplay() {
-    // Analyze woman types
-    const typeCounts = {};
-    myReviews.forEach(review => {
-        const type = review.womanType || '未回答';
-        typeCounts[type] = (typeCounts[type] || 0) + 1;
-    });
-
-    const topType = Object.entries(typeCounts).sort((a, b) => b[1] - a[1])[0];
-    if (topType) {
-        document.getElementById('top-type').textContent = topType[0];
-    }
+    // Calculate average age
+    const totalAge = myReviews.reduce((sum, review) => sum + (parseInt(review.age) || 0), 0);
+    const avgAge = Math.round(totalAge / myReviews.length);
+    document.getElementById('avg-age').textContent = avgAge || '-';
 
     // Create all charts
-    createWomanTypeChart();
     createAgeChart();
     createMaritalChart();
     createChildrenChart();
     displayReviews();
-}
-
-function createWomanTypeChart() {
-    const types = {};
-    myReviews.forEach(review => {
-        const type = review.womanType || '未回答';
-        types[type] = (types[type] || 0) + 1;
-    });
-
-    const ctx = document.getElementById('woman-type-chart');
-    charts.womanType = new Chart(ctx, {
-        type: 'pie',
-        data: {
-            labels: Object.keys(types),
-            datasets: [{
-                data: Object.values(types),
-                backgroundColor: colors.womanType
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            plugins: {
-                legend: { display: false }
-            }
-        }
-    });
-
-    // Create custom legend
-    createLegend('woman-type-legend', Object.keys(types), colors.womanType);
 }
 
 function createAgeChart() {
@@ -260,12 +222,12 @@ function displayReviews() {
         return;
     }
 
-    reviewsList.innerHTML = myReviews.slice(0, 10).map(review => `
+    reviewsList.innerHTML = myReviews.slice(0, 10).map((review, i) => `
         <div class="review-card">
             <div class="review-meta">
-                ${review.age}歳 ${review.gender || ''} ${review.occupation || ''}
+                #${i + 1} | ${review.age}歳 ${review.gender || ''} | ${review.occupation || ''} |
+                ${review.maritalStatus || ''} | ${review.hasChildren || ''} | ${review.prefecture || ''}
             </div>
-            <div class="review-text">${review.comment || 'コメントなし'}</div>
         </div>
     `).join('');
 }
