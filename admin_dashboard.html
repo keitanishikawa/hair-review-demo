@@ -26,6 +26,31 @@
             overflow: hidden;
         }
 
+        .header-logo {
+            position: absolute;
+            top: 24px;
+            left: 24px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 14px;
+            line-height: 1.2;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            z-index: 2;
+        }
+
+        .header-logo-text {
+            display: block;
+            color: #333;
+        }
+
+        .header-logo-year {
+            display: block;
+            color: #667eea;
+            font-size: 11px;
+        }
+
         .header::before {
             content: '';
             position: absolute;
@@ -251,6 +276,10 @@
 </head>
 <body>
     <div class="header">
+        <div class="header-logo">
+            <span class="header-logo-text">id</span>
+            <span class="header-logo-year">2025</span>
+        </div>
         <div class="header-content">
             <div class="header-title">⚙️ 管理者ダッシュボード</div>
             <button class="logout-btn" onclick="logout()">ログアウト</button>
