@@ -29,19 +29,23 @@ function checkAuth() {
 }
 
 function logout() {
+    // Note: Only clears session data, NOT localStorage data
+    // User data (hairdressers, surveys, images) remains saved
     sessionStorage.clear();
     window.location.href = 'login.html';
 }
 
 function refreshData() {
-    location.reload();
+    // Reload display data from localStorage without full page refresh
+    loadSystemStatus();
+    showToast('✅ データを再読込しました', 'success');
 }
 
 function confirmReset() {
-    if (confirm('⚠️ 警告\n\nすべてのデータ（美容師情報、アンケート、画像、オーナー設定）を削除しますか？\n\nこの操作は取り消せません。')) {
+    if (confirm('⚠️ 警告\n\nすべてのデータ（美容師情報、アンケート、画像、オーナー設定）を完全に削除しますか？\n\nこの操作は取り消せません。')) {
         localStorage.clear();
-        alert('✅ すべてのデータをリセットしました');
-        location.reload();
+        showToast('✅ すべてのデータを削除しました', 'success');
+        setTimeout(() => location.reload(), 1000);
     }
 }
 
@@ -671,9 +675,83 @@ function showMessage(elementId, message, isSuccess) {
     element.style.color = isSuccess ? '#2ed573' : '#ff4757';
     element.classList.add('show');
 
+    // Auto-hide after 5 seconds
     setTimeout(() => {
         element.classList.remove('show');
     }, 5000);
+
+    // Also show toast notification for better visibility
+    if (isSuccess) {
+        showToast(message, 'success');
+    }
+}
+
+// Toast notification system for better visibility
+function showToast(message, type = 'success') {
+    // Remove existing toast if any
+    const existingToast = document.querySelector('.toast-notification');
+    if (existingToast) {
+        existingToast.remove();
+    }
+
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.className = 'toast-notification';
+    toast.textContent = message;
+
+    // Style based on type
+    const bgColor = type === 'success' ? '#2ed573' : '#ff4757';
+    toast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${bgColor};
+        color: white;
+        padding: 16px 24px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        font-size: 15px;
+        font-weight: 600;
+        z-index: 10000;
+        animation: slideIn 0.3s ease-out;
+    `;
+
+    // Add animation
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+    `;
+    if (!document.querySelector('#toast-styles')) {
+        style.id = 'toast-styles';
+        document.head.appendChild(style);
+    }
+
+    document.body.appendChild(toast);
+
+    // Auto-remove after 4 seconds
+    setTimeout(() => {
+        toast.style.animation = 'slideOut 0.3s ease-out';
+        setTimeout(() => toast.remove(), 300);
+    }, 4000);
 }
 
 function formatFileSize(bytes) {
