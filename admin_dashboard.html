@@ -26,31 +26,6 @@
             overflow: hidden;
         }
 
-        .header-logo {
-            position: absolute;
-            top: 24px;
-            left: 24px;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 6px 10px;
-            border-radius: 4px;
-            font-weight: bold;
-            font-size: 14px;
-            line-height: 1.2;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            z-index: 2;
-        }
-
-        .header-logo-text {
-            display: block;
-            color: #333;
-        }
-
-        .header-logo-year {
-            display: block;
-            color: #667eea;
-            font-size: 11px;
-        }
-
         .header::before {
             content: '';
             position: absolute;
@@ -276,10 +251,6 @@
 </head>
 <body>
     <div class="header">
-        <div class="header-logo">
-            <span class="header-logo-text">id</span>
-            <span class="header-logo-year">2025</span>
-        </div>
         <div class="header-content">
             <div class="header-title">⚙️ 管理者ダッシュボード</div>
             <button class="logout-btn" onclick="logout()">ログアウト</button>
@@ -399,6 +370,30 @@
                     <div class="stat-label">オーナー設定</div>
                     <div class="stat-value" id="owner-status" style="font-size: 16px;">未設定</div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Uploaded Hairdressers -->
+        <div class="card">
+            <h2 class="card-title">👥 登録美容師一覧</h2>
+            <div id="hairdresser-list" style="max-height: 400px; overflow-y: auto;">
+                <p style="color: #999; padding: 20px; text-align: center;">データがアップロードされていません</p>
+            </div>
+        </div>
+
+        <!-- Uploaded Images -->
+        <div class="card">
+            <h2 class="card-title">🖼️ アップロード画像一覧</h2>
+            <div id="image-list" style="max-height: 400px; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 12px;">
+                <p style="color: #999; padding: 20px; text-align: center; grid-column: 1/-1;">画像がアップロードされていません</p>
+            </div>
+        </div>
+
+        <!-- Survey Data Sample -->
+        <div class="card">
+            <h2 class="card-title">📊 アンケートデータサンプル（最新10件）</h2>
+            <div id="survey-list" style="max-height: 400px; overflow-y: auto;">
+                <p style="color: #999; padding: 20px; text-align: center;">データがアップロードされていません</p>
             </div>
         </div>
     </div>

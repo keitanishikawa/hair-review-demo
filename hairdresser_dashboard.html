@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>美容師ダッシュボード | Hair Design Review</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
@@ -13,171 +13,137 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'Meiryo', sans-serif;
-            background: #f5f5f5;
-            padding-bottom: 70px;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        /* Header with animated gradient */
-        .header {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #feca57 100%);
-            background-size: 400% 400%;
-            animation: gradient 15s ease infinite;
-            padding: 16px 20px;
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
+            padding: 20px;
             position: relative;
+            overflow: hidden;
         }
 
-        @keyframes gradient {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        /* ID 2025 Logo */
-        .header-logo {
+        .header::before {
+            content: '';
             position: absolute;
-            top: 16px;
-            left: 20px;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-weight: bold;
-            font-size: 12px;
-            line-height: 1.2;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(255, 255, 255, 0.05) 10px,
+                rgba(255, 255, 255, 0.05) 20px
+            );
+            animation: slide 20s linear infinite;
         }
 
-        .header-logo-text {
-            display: block;
-            color: #333;
+        @keyframes slide {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
         }
 
-        .header-logo-year {
-            display: block;
-            color: #667eea;
-            font-size: 10px;
-        }
-
-        /* Logout Button */
-        .logout-btn {
-            position: absolute;
-            top: 16px;
-            right: 20px;
-            background: rgba(255, 255, 255, 0.25);
-            color: white;
-            border: none;
-            padding: 6px 14px;
-            border-radius: 16px;
-            font-size: 13px;
-            cursor: pointer;
-            z-index: 2;
-            font-weight: 500;
-        }
-
-        /* Profile Section */
-        .profile-section {
+        .profile {
+            position: relative;
+            z-index: 1;
             text-align: center;
-            padding: 40px 20px 20px;
-        }
-
-        .profile-image-wrapper {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 12px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea, #764ba2, #f093fb, #f5576c);
-            padding: 3px;
-            position: relative;
+            margin-top: 20px;
         }
 
         .profile-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 4px solid white;
+            background: white;
+            margin: 0 auto 12px;
+            overflow: hidden;
+        }
+
+        .profile-image img {
             width: 100%;
             height: 100%;
-            border-radius: 50%;
             object-fit: cover;
-            background: #fff;
-            border: 3px solid #fff;
         }
 
         .profile-name {
-            color: #fff;
+            color: white;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .profile-salon {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .main-content {
+            background: white;
+            margin: -20px 0 0 0;
+            border-radius: 20px 20px 0 0;
+            padding: 24px 16px;
+            min-height: calc(100vh - 280px);
+        }
+
+        .section-title {
             font-size: 18px;
             font-weight: 600;
-        }
-
-        /* Main Content */
-        .main-content {
-            background: #fff;
-            border-radius: 24px 24px 0 0;
-            margin-top: 20px;
-            min-height: calc(100vh - 200px);
-        }
-
-        /* Section Title */
-        .section-title {
-            padding: 20px 20px 16px;
-            font-size: 16px;
-            font-weight: 600;
             color: #333;
-            border-bottom: 1px solid #f0f0f0;
+            margin-bottom: 16px;
         }
 
-        /* Tabs */
         .tabs {
             display: flex;
-            border-bottom: 1px solid #e0e0e0;
-            background: #fff;
-            position: sticky;
-            top: 0;
-            z-index: 10;
+            gap: 8px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .tab {
-            flex: 1;
-            padding: 14px 8px;
-            text-align: center;
-            font-size: 13px;
-            color: #999;
-            background: none;
+            padding: 10px 20px;
+            background: #f5f5f5;
             border: none;
-            border-bottom: 2px solid transparent;
+            border-radius: 20px;
+            font-size: 14px;
+            white-space: nowrap;
             cursor: pointer;
             transition: all 0.3s;
+            color: #666;
             font-weight: 500;
         }
 
         .tab.active {
-            color: #e91e63;
-            border-bottom-color: #e91e63;
-            font-weight: 600;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
         }
 
-        /* Tab Content */
-        .tab-content {
-            display: none;
-            padding: 24px 20px;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        /* Chart Container */
         .chart-container {
-            position: relative;
-            width: 100%;
-            max-width: 320px;
-            margin: 0 auto 24px;
+            margin: 20px 0;
+            padding: 20px;
+            background: #fafafa;
+            border-radius: 16px;
         }
 
-        /* Legend */
-        .chart-legend {
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
+            margin: 0 auto;
+            max-width: 300px;
+        }
+
+        .legend {
             display: flex;
             flex-wrap: wrap;
             gap: 12px;
+            margin-top: 16px;
             justify-content: center;
-            margin-top: 20px;
         }
 
         .legend-item {
@@ -190,118 +156,146 @@
         .legend-color {
             width: 16px;
             height: 16px;
-            border-radius: 3px;
+            border-radius: 4px;
         }
 
-        .legend-label {
-            color: #666;
-        }
-
-        /* Reviews Section */
         .reviews-section {
-            padding: 0 20px 20px;
-        }
-
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-
-        .section-subtitle {
-            font-size: 15px;
-            font-weight: 600;
-            color: #333;
+            margin-top: 32px;
         }
 
         .review-card {
-            background: #f8f8f8;
+            background: #fafafa;
             border-radius: 12px;
             padding: 16px;
             margin-bottom: 12px;
         }
 
-        .review-text {
-            font-size: 14px;
-            color: #333;
-            line-height: 1.6;
+        .review-meta {
+            font-size: 13px;
+            color: #999;
             margin-bottom: 8px;
         }
 
-        .review-meta {
-            font-size: 12px;
-            color: #999;
+        .review-text {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #333;
         }
 
-        /* Bottom Navigation */
         .bottom-nav {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background: #fff;
-            border-top: 1px solid #e0e0e0;
+            background: white;
+            border-top: 1px solid #eee;
             display: flex;
-            padding: 8px 0;
+            justify-content: space-around;
+            padding: 12px 0;
             z-index: 100;
         }
 
         .nav-item {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            padding: 8px;
+            text-align: center;
             color: #999;
             text-decoration: none;
-            font-size: 11px;
-            cursor: pointer;
-            background: none;
-            border: none;
+            flex: 1;
+            padding: 8px;
+            transition: all 0.3s;
         }
 
         .nav-item.active {
-            color: #e91e63;
+            color: #667eea;
         }
 
         .nav-icon {
-            font-size: 20px;
+            font-size: 24px;
+            margin-bottom: 4px;
         }
 
-        /* Loading & No Data */
-        .loading, .no-data {
+        .nav-label {
+            font-size: 12px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 16px;
+            border-radius: 12px;
             text-align: center;
-            padding: 40px 20px;
-            color: #999;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            opacity: 0.9;
+        }
+
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
             font-size: 14px;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
         }
     </style>
 </head>
 <body>
-    <!-- Header -->
     <div class="header">
-        <div class="header-logo">
-            <span class="header-logo-text">id</span>
-            <span class="header-logo-year">2025</span>
-        </div>
-
         <button class="logout-btn" onclick="logout()">ログアウト</button>
-
-        <div class="profile-section">
-            <div class="profile-image-wrapper">
-                <img id="profile-img" class="profile-image" src="" alt="プロフィール">
+        <div class="profile">
+            <div class="profile-image">
+                <img id="profile-img" src="" alt="プロフィール">
             </div>
-            <div id="user-name" class="profile-name"></div>
+            <div class="profile-name" id="user-name"></div>
+            <div class="profile-salon" id="salon-name"></div>
         </div>
     </div>
 
-    <!-- Main Content -->
     <div class="main-content">
+        <div class="stats-grid">
+            <div class="stat-box">
+                <div class="stat-value" id="review-count">0</div>
+                <div class="stat-label">レビュー</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="target-age">-</div>
+                <div class="stat-label">ターゲット</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="top-type" style="font-size: 14px;">-</div>
+                <div class="stat-label">最多像</div>
+            </div>
+        </div>
+
         <div class="section-title">あなたを評価した人のデータ</div>
 
-        <!-- Tabs -->
         <div class="tabs">
             <button class="tab active" data-tab="woman-type">女性像</button>
             <button class="tab" data-tab="age">年代</button>
@@ -309,62 +303,65 @@
             <button class="tab" data-tab="children">子供の有無</button>
         </div>
 
-        <!-- Tab Contents -->
-        <div id="woman-type" class="tab-content active">
+        <div class="tab-content active" id="woman-type">
             <div class="chart-container">
-                <canvas id="woman-type-chart"></canvas>
+                <div class="chart-wrapper">
+                    <canvas id="woman-type-chart"></canvas>
+                </div>
+                <div class="legend" id="woman-type-legend"></div>
             </div>
-            <div id="woman-type-legend" class="chart-legend"></div>
         </div>
 
-        <div id="age" class="tab-content">
+        <div class="tab-content" id="age">
             <div class="chart-container">
-                <canvas id="age-chart"></canvas>
+                <div class="chart-wrapper">
+                    <canvas id="age-chart"></canvas>
+                </div>
+                <div class="legend" id="age-legend"></div>
             </div>
-            <div id="age-legend" class="chart-legend"></div>
         </div>
 
-        <div id="marital" class="tab-content">
+        <div class="tab-content" id="marital">
             <div class="chart-container">
-                <canvas id="marital-chart"></canvas>
+                <div class="chart-wrapper">
+                    <canvas id="marital-chart"></canvas>
+                </div>
+                <div class="legend" id="marital-legend"></div>
             </div>
-            <div id="marital-legend" class="chart-legend"></div>
         </div>
 
-        <div id="children" class="tab-content">
+        <div class="tab-content" id="children">
             <div class="chart-container">
-                <canvas id="children-chart"></canvas>
+                <div class="chart-wrapper">
+                    <canvas id="children-chart"></canvas>
+                </div>
+                <div class="legend" id="children-legend"></div>
             </div>
-            <div id="children-legend" class="chart-legend"></div>
         </div>
 
-        <!-- Reviews Section -->
         <div class="reviews-section">
-            <div class="section-header">
-                <div class="section-subtitle">あなたの作品へのレビュー</div>
-            </div>
+            <div class="section-title">あなたの作品へのレビュー</div>
             <div id="reviews-list"></div>
         </div>
     </div>
 
-    <!-- Bottom Navigation -->
     <div class="bottom-nav">
-        <button class="nav-item active">
-            <span class="nav-icon">📊</span>
-            <span>評価</span>
-        </button>
-        <button class="nav-item">
-            <span class="nav-icon">📝</span>
-            <span>レビュー</span>
-        </button>
-        <button class="nav-item">
-            <span class="nav-icon">⭐</span>
-            <span>人気作品</span>
-        </button>
-        <button class="nav-item" onclick="showMyPage()">
-            <span class="nav-icon">👤</span>
-            <span>マイページ</span>
-        </button>
+        <a href="#" class="nav-item active">
+            <div class="nav-icon">🎨</div>
+            <div class="nav-label">作品</div>
+        </a>
+        <a href="#" class="nav-item">
+            <div class="nav-icon">📝</div>
+            <div class="nav-label">レビュー</div>
+        </a>
+        <a href="#" class="nav-item">
+            <div class="nav-icon">⭐</div>
+            <div class="nav-label">人気作品</div>
+        </a>
+        <a href="#" class="nav-item">
+            <div class="nav-icon">👤</div>
+            <div class="nav-label">マイページ</div>
+        </a>
     </div>
 
     <script src="js/hairdresser.js"></script>

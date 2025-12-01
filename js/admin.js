@@ -35,6 +35,86 @@ function loadSystemStatus() {
     // Load owner status
     const ownerEmail = localStorage.getItem('ownerEmail');
     document.getElementById('owner-status').textContent = ownerEmail ? '設定済み' : '未設定';
+
+    // Load detailed data lists
+    loadHairdresserList();
+    loadImageList();
+    loadSurveyList();
+}
+
+function loadHairdresserList() {
+    const hairdressers = JSON.parse(localStorage.getItem('hairdressers') || '[]');
+    const listEl = document.getElementById('hairdresser-list');
+
+    if (hairdressers.length === 0) {
+        listEl.innerHTML = '<p style="color: #999; padding: 20px; text-align: center;">データがアップロードされていません</p>';
+        return;
+    }
+
+    listEl.innerHTML = hairdressers.map((h, i) => `
+        <div style="padding: 16px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <div style="font-weight: 600; color: #333; margin-bottom: 4px;">${i + 1}. ${h.name || '名前なし'}</div>
+                <div style="font-size: 13px; color: #666; margin-bottom: 2px;">📧 ${h.email || 'メールなし'}</div>
+                <div style="font-size: 13px; color: #666; margin-bottom: 2px;">🏢 ${h.salon || 'サロン名なし'}</div>
+                <div style="font-size: 13px; color: #666;">🎯 ターゲット年齢: ${h.targetAge || '未設定'}</div>
+            </div>
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 8px 16px; border-radius: 8px; font-size: 12px;">
+                画像: ${h.imageFile || 'なし'}
+            </div>
+        </div>
+    `).join('');
+}
+
+function loadImageList() {
+    const images = JSON.parse(localStorage.getItem('images') || '{}');
+    const listEl = document.getElementById('image-list');
+    const imageKeys = Object.keys(images);
+
+    if (imageKeys.length === 0) {
+        listEl.innerHTML = '<p style="color: #999; padding: 20px; text-align: center; grid-column: 1/-1;">画像がアップロードされていません</p>';
+        return;
+    }
+
+    listEl.innerHTML = imageKeys.map(key => `
+        <div style="border: 2px solid #e0e0e0; border-radius: 8px; overflow: hidden; background: white;">
+            <img src="${images[key]}" alt="${key}" style="width: 100%; height: 120px; object-fit: cover;">
+            <div style="padding: 8px; font-size: 11px; color: #666; text-align: center; border-top: 1px solid #e0e0e0;">
+                ${key}
+            </div>
+        </div>
+    `).join('');
+}
+
+function loadSurveyList() {
+    const surveys = JSON.parse(localStorage.getItem('surveys') || '[]');
+    const listEl = document.getElementById('survey-list');
+
+    if (surveys.length === 0) {
+        listEl.innerHTML = '<p style="color: #999; padding: 20px; text-align: center;">データがアップロードされていません</p>';
+        return;
+    }
+
+    // Show latest 10 surveys
+    const latestSurveys = surveys.slice(0, 10);
+
+    listEl.innerHTML = latestSurveys.map((s, i) => `
+        <div style="padding: 16px; border-bottom: 1px solid #f0f0f0;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <span style="font-weight: 600; color: #667eea;">🖼️ ${s.imageFile || '画像なし'}</span>
+                <span style="font-size: 12px; color: #999;">#${i + 1}</span>
+            </div>
+            <div style="font-size: 14px; color: #333; margin-bottom: 8px; line-height: 1.6;">
+                💬 ${s.comment || 'コメントなし'}
+            </div>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px; color: #666;">
+                <span>👤 ${s.occupation || '-'} (${s.age || '-'}歳, ${s.gender || '-'})</span>
+                <span>💍 ${s.maritalStatus || '-'}</span>
+                <span>👶 子供: ${s.hasChildren || '-'}</span>
+                <span>✨ ${s.womanType || '-'}</span>
+            </div>
+        </div>
+    `).join('');
 }
 
 function loadOwnerEmail() {
