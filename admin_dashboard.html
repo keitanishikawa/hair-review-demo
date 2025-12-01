@@ -4,73 +4,223 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>管理者ダッシュボード | Hair Design Review</title>
-    <link rel="stylesheet" href="css/style.css">
     <style>
-        .upload-section {
-            background: var(--bg-white);
-            border-radius: 12px;
-            padding: 32px;
-            box-shadow: var(--shadow-sm);
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #feca57 100%);
+            min-height: 100vh;
+            padding-bottom: 40px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
+            padding: 24px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(255, 255, 255, 0.05) 10px,
+                rgba(255, 255, 255, 0.05) 20px
+            );
+            animation: slide 20s linear infinite;
+        }
+
+        @keyframes slide {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: -20px auto 0;
+            padding: 0 16px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
             margin-bottom: 24px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #333;
         }
 
         .upload-area {
-            border: 2px dashed var(--border-color);
+            border: 2px dashed #ccc;
             border-radius: 12px;
-            padding: 40px;
+            padding: 32px;
             text-align: center;
-            background: var(--bg-light);
-            transition: all 0.3s ease;
-            margin-top: 16px;
+            background: #fafafa;
+            transition: all 0.3s;
+            cursor: pointer;
         }
 
         .upload-area:hover {
-            border-color: var(--secondary-color);
+            border-color: #667eea;
             background: #f0f4ff;
         }
 
         .upload-area.drag-over {
-            border-color: var(--secondary-color);
+            border-color: #667eea;
             background: #e8f0ff;
         }
 
         .upload-icon {
             font-size: 48px;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
         }
 
         .upload-text {
             font-size: 16px;
-            color: var(--text-primary);
+            color: #666;
             margin-bottom: 8px;
         }
 
         .upload-hint {
             font-size: 14px;
-            color: var(--text-secondary);
+            color: #999;
+        }
+
+        .upload-btn {
+            margin-top: 16px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .upload-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
         }
 
         .file-input {
             display: none;
         }
 
-        .upload-btn {
-            display: inline-block;
-            margin-top: 16px;
-            padding: 12px 24px;
-            background: var(--secondary-color);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 15px;
-            font-weight: 600;
-            transition: all 0.2s ease;
+        .form-group {
+            margin-bottom: 16px;
         }
 
-        .upload-btn:hover {
-            background: var(--primary-color);
-            transform: translateY(-2px);
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .success-message {
+            padding: 12px 16px;
+            background: #d4f4dd;
+            color: #2ed573;
+            border-radius: 8px;
+            margin-top: 16px;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .stat-box {
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
         }
 
         .file-list {
@@ -82,136 +232,58 @@
             align-items: center;
             justify-content: space-between;
             padding: 12px;
-            background: var(--bg-light);
+            background: #f5f5f5;
             border-radius: 8px;
             margin-bottom: 8px;
         }
 
         .file-name {
             font-size: 14px;
-            color: var(--text-primary);
+            color: #333;
         }
 
         .file-size {
             font-size: 12px;
-            color: var(--text-secondary);
-            margin-left: 12px;
-        }
-
-        .remove-file {
-            color: var(--danger-color);
-            cursor: pointer;
-            padding: 4px 12px;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-
-        .remove-file:hover {
-            background: #ffe0e0;
-        }
-
-        .success-message {
-            padding: 12px 16px;
-            background: #d4f4dd;
-            color: var(--success-color);
-            border-radius: 8px;
-            margin-top: 16px;
-            display: none;
-        }
-
-        .success-message.show {
-            display: block;
-        }
-
-        .config-section {
-            background: var(--bg-white);
-            border-radius: 12px;
-            padding: 32px;
-            box-shadow: var(--shadow-sm);
-            margin-bottom: 24px;
-        }
-
-        .config-form {
-            margin-top: 16px;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin-top: 16px;
-        }
-
-        .stat-box {
-            padding: 16px;
-            background: var(--bg-light);
-            border-radius: 8px;
-            border-left: 4px solid var(--secondary-color);
-        }
-
-        .stat-label {
-            font-size: 13px;
-            color: var(--text-secondary);
-            margin-bottom: 4px;
-        }
-
-        .stat-value {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--primary-color);
+            color: #999;
+            margin-left: 8px;
         }
     </style>
 </head>
-<body class="dashboard-page">
-    <header class="header">
+<body>
+    <div class="header">
         <div class="header-content">
-            <div class="header-logo">
-                <span class="logo-text">id</span>
-                <span class="logo-year">2025</span>
-            </div>
-            <div class="header-user">
-                <span class="user-name">⚙️ システム管理者</span>
-                <button class="logout-btn" onclick="logout()">ログアウト</button>
-            </div>
+            <div class="header-title">⚙️ 管理者ダッシュボード</div>
+            <button class="logout-btn" onclick="logout()">ログアウト</button>
         </div>
-    </header>
+    </div>
 
-    <main class="main-container">
-        <div class="page-header">
-            <h1 class="page-title">管理者ダッシュボード</h1>
-            <p class="page-subtitle">データ管理とシステム設定</p>
-        </div>
-
+    <div class="container">
         <!-- Owner Email Configuration -->
-        <section class="config-section">
-            <h2 class="section-title">👑 オーナーメールアドレス設定</h2>
-            <div class="config-form">
-                <div class="form-group">
-                    <label for="owner-email-input">オーナー用メールアドレス</label>
-                    <input
-                        type="email"
-                        id="owner-email-input"
-                        placeholder="owner@example.com"
-                        style="width: 100%; padding: 12px; border: 2px solid var(--border-color); border-radius: 8px; font-size: 15px;"
-                    >
-                </div>
-                <button class="upload-btn" onclick="saveOwnerEmail()">
-                    設定を保存
-                </button>
-                <div id="owner-config-success" class="success-message"></div>
+        <div class="card">
+            <h2 class="card-title">👑 オーナーメールアドレス設定</h2>
+            <div class="form-group">
+                <label for="owner-email-input">オーナー用メールアドレス</label>
+                <input
+                    type="email"
+                    id="owner-email-input"
+                    placeholder="owner@example.com"
+                >
             </div>
-        </section>
+            <button class="upload-btn" onclick="saveOwnerEmail()">
+                設定を保存
+            </button>
+            <div id="owner-config-success" class="success-message"></div>
+        </div>
 
-        <!-- CSV Upload Section -->
-        <section class="upload-section">
-            <h2 class="section-title">📁 美容師CSVアップロード</h2>
-            <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px;">
-                氏名、サロン名、メールアドレス、ターゲット年齢、画像ファイル名を含むCSVファイルをアップロードしてください。
+        <!-- Hairdresser CSV Upload -->
+        <div class="card">
+            <h2 class="card-title">📁 美容師CSVアップロード</h2>
+            <p style="font-size: 14px; color: #666; margin-bottom: 16px;">
+                氏名、サロン名、メールアドレス、ターゲット年齢、画像ファイル名を含むCSVファイル
             </p>
-
             <div class="upload-area" id="hairdresser-upload-area">
                 <div class="upload-icon">📄</div>
-                <div class="upload-text">美容師CSVファイルをドラッグ＆ドロップ</div>
+                <div class="upload-text">CSVファイルをドラッグ＆ドロップ</div>
                 <div class="upload-hint">または</div>
                 <button class="upload-btn" onclick="document.getElementById('hairdresser-csv').click()">
                     ファイルを選択
@@ -226,18 +298,17 @@
             </div>
             <div id="hairdresser-file-list" class="file-list"></div>
             <div id="hairdresser-success" class="success-message"></div>
-        </section>
+        </div>
 
-        <!-- Survey CSV Upload Section -->
-        <section class="upload-section">
-            <h2 class="section-title">📊 一般女性アンケートCSVアップロード</h2>
-            <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px;">
-                選択した画像ファイル名、職業、年齢、性別、子供の有無、結婚/未婚、女性像を含むCSVファイルをアップロードしてください。
+        <!-- Survey CSV Upload -->
+        <div class="card">
+            <h2 class="card-title">📊 一般女性アンケートCSVアップロード</h2>
+            <p style="font-size: 14px; color: #666; margin-bottom: 16px;">
+                選択した画像ファイル名、職業、年齢、性別、子供の有無、結婚/未婚、女性像を含むCSVファイル
             </p>
-
             <div class="upload-area" id="survey-upload-area">
                 <div class="upload-icon">📊</div>
-                <div class="upload-text">アンケートCSVファイルをドラッグ＆ドロップ</div>
+                <div class="upload-text">CSVファイルをドラッグ＆ドロップ</div>
                 <div class="upload-hint">または</div>
                 <button class="upload-btn" onclick="document.getElementById('survey-csv').click()">
                     ファイルを選択
@@ -252,18 +323,17 @@
             </div>
             <div id="survey-file-list" class="file-list"></div>
             <div id="survey-success" class="success-message"></div>
-        </section>
+        </div>
 
-        <!-- Image ZIP Upload Section -->
-        <section class="upload-section">
-            <h2 class="section-title">🖼️ 画像ZIPアップロード</h2>
-            <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px;">
-                美容師が投稿した写真を含むZIPファイルをアップロードしてください。
+        <!-- Image ZIP Upload -->
+        <div class="card">
+            <h2 class="card-title">🖼️ 画像ZIPアップロード</h2>
+            <p style="font-size: 14px; color: #666; margin-bottom: 16px;">
+                美容師が投稿した写真を含むZIPファイル
             </p>
-
             <div class="upload-area" id="image-upload-area">
                 <div class="upload-icon">🗜️</div>
-                <div class="upload-text">画像ZIPファイルをドラッグ＆ドロップ</div>
+                <div class="upload-text">ZIPファイルをドラッグ＆ドロップ</div>
                 <div class="upload-hint">または</div>
                 <button class="upload-btn" onclick="document.getElementById('image-zip').click()">
                     ファイルを選択
@@ -278,11 +348,11 @@
             </div>
             <div id="image-file-list" class="file-list"></div>
             <div id="image-success" class="success-message"></div>
-        </section>
+        </div>
 
         <!-- System Status -->
-        <section class="config-section">
-            <h2 class="section-title">📈 システムステータス</h2>
+        <div class="card">
+            <h2 class="card-title">📈 システムステータス</h2>
             <div class="stats-grid">
                 <div class="stat-box">
                     <div class="stat-label">登録美容師数</div>
@@ -301,8 +371,8 @@
                     <div class="stat-value" id="owner-status" style="font-size: 16px;">未設定</div>
                 </div>
             </div>
-        </section>
-    </main>
+        </div>
+    </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
