@@ -505,8 +505,9 @@ function displaySurveyPreview(results) {
         { name: '都道府県', aliases: ['都道府県', '県', 'prefecture', '住所', '地域', '都道府', 'エリア'] },
         { name: '性別', aliases: ['性別', 'gender', 'sex', '男女', '性'] },
         { name: '結婚', aliases: ['結婚', '婚姻', 'marital_status', 'marital', '既婚', '未婚', '結婚状態'] },
-        { name: '職業', aliases: ['職業', 'occupation', 'job', '仕事', 'work'] },
         { name: '子供有無', aliases: ['子供有無', '子供', 'has_children', 'children', '子ども', 'こども', '子供の有無'] },
+        { name: '職業', aliases: ['職業', 'occupation', 'job', '仕事', 'work'] },
+        { name: '女性像', aliases: ['女性像', 'womanType', 'woman_type', 'タイプ', 'type', '女性タイプ'] },
         { name: '画像ファイル名', aliases: ['画像ファイル名', '画像', 'image_file', 'imageFile', 'ファイル名', 'file', 'filename', '画像名'] }
     ];
 
@@ -543,7 +544,7 @@ function displaySurveyPreview(results) {
     mappingHtml += '<button onclick="applySurveyMapping()" style="margin-top: 12px; padding: 8px 16px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">✓ マッピングを適用してプレビュー更新</button>';
     mappingHtml += '</div>';
 
-    const headers_display = ['年齢', '都道府県', '性別', '結婚', '職業', '子供有無', '画像ファイル名'];
+    const headers_display = ['年齢', '都道府県', '性別', '結婚', '子供有無', '職業', '女性像', '画像ファイル名'];
 
     let html = mappingHtml;
     html += '<table style="width: 100%; border-collapse: collapse; background: white; font-size: 13px;">';
@@ -560,8 +561,9 @@ function displaySurveyPreview(results) {
         html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${row[surveyColumnMapping['都道府県']] || findColumn(row, ['都道府県', '県', 'prefecture', '住所', '地域']) || '-'}</td>`;
         html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${row[surveyColumnMapping['性別']] || findColumn(row, ['性別', 'gender', 'sex', '男女']) || '-'}</td>`;
         html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${row[surveyColumnMapping['結婚']] || findColumn(row, ['結婚', '婚姻', 'marital_status', 'marital', '結婚状態']) || '-'}</td>`;
-        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${row[surveyColumnMapping['職業']] || findColumn(row, ['職業', 'occupation', 'job', '仕事']) || '-'}</td>`;
         html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${row[surveyColumnMapping['子供有無']] || findColumn(row, ['子供有無', '子供', 'has_children', 'children', '子ども']) || '-'}</td>`;
+        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${row[surveyColumnMapping['職業']] || findColumn(row, ['職業', 'occupation', 'job', '仕事']) || '-'}</td>`;
+        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${row[surveyColumnMapping['女性像']] || findColumn(row, ['女性像', 'womanType', 'woman_type', 'タイプ']) || '-'}</td>`;
         html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0; font-family: monospace; font-size: 12px;">${row[surveyColumnMapping['画像ファイル名']] || findColumn(row, ['画像ファイル名', '画像', 'image_file', 'imageFile', 'ファイル名']) || '-'}</td>`;
         html += '</tr>';
     });
@@ -600,8 +602,9 @@ function processSurveyData(results) {
             prefecture: row[surveyColumnMapping['都道府県']] || findColumn(row, ['都道府県', '県', 'prefecture', '住所', '地域']),
             gender: row[surveyColumnMapping['性別']] || findColumn(row, ['性別', 'gender', 'sex', '男女']),
             maritalStatus: row[surveyColumnMapping['結婚']] || findColumn(row, ['結婚', '婚姻', 'marital_status', 'marital', '結婚状態']),
-            occupation: row[surveyColumnMapping['職業']] || findColumn(row, ['職業', 'occupation', 'job', '仕事']),
             hasChildren: row[surveyColumnMapping['子供有無']] || findColumn(row, ['子供有無', '子供', 'has_children', 'children', '子ども', '子供の有無']),
+            occupation: row[surveyColumnMapping['職業']] || findColumn(row, ['職業', 'occupation', 'job', '仕事']),
+            womanType: row[surveyColumnMapping['女性像']] || findColumn(row, ['女性像', 'womanType', 'woman_type', 'タイプ', 'type']),
             imageFile: row[surveyColumnMapping['画像ファイル名']] || findColumn(row, ['画像ファイル名', '画像', 'image_file', 'imageFile', 'ファイル名'])
         }));
 
