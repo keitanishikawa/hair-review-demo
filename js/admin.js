@@ -2,10 +2,24 @@
 
 document.addEventListener('DOMContentLoaded', () => {
     checkAuth();
+    clearLegacyData();
     loadSystemStatus();
     loadOwnerEmail();
     setupDragAndDrop();
 });
+
+function clearLegacyData() {
+    // Check if there's old data with womanType field (legacy structure)
+    const surveys = JSON.parse(localStorage.getItem('surveys') || '[]');
+    if (surveys.length > 0 && surveys[0].womanType !== undefined) {
+        console.log('🗑️ 古いデータ構造を検出しました。すべてのデータをクリアします...');
+        localStorage.removeItem('hairdressers');
+        localStorage.removeItem('surveys');
+        localStorage.removeItem('images');
+        alert('⚠️ 古いデータ構造が検出されたため、すべてのデータをクリアしました。\n新しいCSVファイルをアップロードしてください。');
+        location.reload();
+    }
+}
 
 function checkAuth() {
     const user = JSON.parse(sessionStorage.getItem('currentUser'));
