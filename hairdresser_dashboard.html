@@ -264,6 +264,99 @@
         .tab-content.active {
             display: block;
         }
+
+        .recommendation-section {
+            margin-bottom: 32px;
+        }
+
+        .recommendation-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .recommendation-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .recommendation-text {
+            font-size: 14px;
+            line-height: 1.7;
+            opacity: 0.95;
+            margin-bottom: 16px;
+        }
+
+        .insight-box {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 12px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .insight-label {
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 13px;
+        }
+
+        .comparison-container {
+            padding: 16px;
+        }
+
+        .comparison-stat {
+            background: #fafafa;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            border-left: 4px solid #667eea;
+        }
+
+        .comparison-stat-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .comparison-bar {
+            background: #e0e0e0;
+            height: 24px;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 6px;
+            position: relative;
+        }
+
+        .comparison-bar-fill {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            height: 100%;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 8px;
+        }
+
+        .comparison-bar-label {
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .comparison-detail {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
     </style>
 </head>
 <body>
@@ -294,12 +387,22 @@
             </div>
         </div>
 
-        <div class="section-title">あなたを評価した人のデータ</div>
+        <!-- Target Customer Recommendation Section -->
+        <div class="recommendation-section" id="recommendation-section">
+            <div class="section-title">💡 あなたのターゲット顧客層</div>
+            <div class="recommendation-card" id="target-recommendation"></div>
+        </div>
+
+        <div class="section-title">📊 顧客層データ分析</div>
 
         <div class="tabs">
             <button class="tab active" data-tab="age">年代</button>
-            <button class="tab" data-tab="marital">既婚</button>
+            <button class="tab" data-tab="womanType">女性像</button>
+            <button class="tab" data-tab="occupation">職業</button>
+            <button class="tab" data-tab="marital">既婚/未婚</button>
             <button class="tab" data-tab="children">子供の有無</button>
+            <button class="tab" data-tab="cross">職業×女性像</button>
+            <button class="tab" data-tab="comparison">比較分析</button>
         </div>
 
         <div class="tab-content active" id="age">
@@ -308,6 +411,24 @@
                     <canvas id="age-chart"></canvas>
                 </div>
                 <div class="legend" id="age-legend"></div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="womanType">
+            <div class="chart-container">
+                <div class="chart-wrapper">
+                    <canvas id="womanType-chart"></canvas>
+                </div>
+                <div class="legend" id="womanType-legend"></div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="occupation">
+            <div class="chart-container">
+                <div class="chart-wrapper">
+                    <canvas id="occupation-chart"></canvas>
+                </div>
+                <div class="legend" id="occupation-legend"></div>
             </div>
         </div>
 
@@ -329,29 +450,25 @@
             </div>
         </div>
 
+        <div class="tab-content" id="cross">
+            <div class="chart-container">
+                <div style="position: relative; height: 400px;">
+                    <canvas id="cross-chart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="comparison">
+            <div class="comparison-container" id="comparison-container">
+                <div class="section-title" style="font-size: 16px; margin-bottom: 12px;">🔍 他の美容師との比較</div>
+                <div id="comparison-content"></div>
+            </div>
+        </div>
+
         <div class="reviews-section">
-            <div class="section-title">あなたの作品へのレビュー</div>
+            <div class="section-title">📝 あなたの作品のレビューデータ</div>
             <div id="reviews-list"></div>
         </div>
-    </div>
-
-    <div class="bottom-nav">
-        <a href="#" class="nav-item active">
-            <div class="nav-icon">🎨</div>
-            <div class="nav-label">作品</div>
-        </a>
-        <a href="#" class="nav-item">
-            <div class="nav-icon">📝</div>
-            <div class="nav-label">レビュー</div>
-        </a>
-        <a href="#" class="nav-item">
-            <div class="nav-icon">⭐</div>
-            <div class="nav-label">人気作品</div>
-        </a>
-        <a href="#" class="nav-item">
-            <div class="nav-icon">👤</div>
-            <div class="nav-label">マイページ</div>
-        </a>
     </div>
 
     <script src="js/hairdresser.js"></script>
