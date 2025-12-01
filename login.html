@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hair Design Review System - ログイン</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .login-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 32px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .login-tab {
+            padding: 12px 24px;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            top: 2px;
+        }
+
+        .login-tab:hover {
+            color: var(--primary-color);
+        }
+
+        .login-tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--secondary-color);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .tab-description {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            padding: 12px;
+            background: var(--bg-light);
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body class="login-page">
+    <div class="login-container" style="max-width: 520px;">
+        <div class="login-header">
+            <div class="logo">
+                <span class="logo-text">id</span>
+                <span class="logo-year">2025</span>
+            </div>
+            <h1>Hair Design Review</h1>
+            <p class="subtitle">ヘアデザインレビューシステム</p>
+        </div>
+
+        <!-- Login Tabs -->
+        <div class="login-tabs">
+            <button class="login-tab active" data-tab="hairdresser">🎨 美容師</button>
+            <button class="login-tab" data-tab="owner">👑 オーナー</button>
+            <button class="login-tab" data-tab="admin">⚙️ 管理者</button>
+        </div>
+
+        <!-- Hairdresser Login -->
+        <div class="tab-content active" id="hairdresser-tab">
+            <div class="tab-description">
+                美容師の方は、登録されたメールアドレスでログインしてください。
+            </div>
+            <div class="login-form">
+                <div class="form-group">
+                    <label for="hairdresser-email">メールアドレス</label>
+                    <input
+                        type="email"
+                        id="hairdresser-email"
+                        placeholder="例: yamada@salon.com"
+                        autocomplete="email"
+                    >
+                </div>
+                <button class="btn-primary" onclick="loginHairdresser()">
+                    <span class="btn-text">ログイン</span>
+                    <span class="btn-arrow">→</span>
+                </button>
+                <div id="hairdresser-error" class="error-message"></div>
+            </div>
+        </div>
+
+        <!-- Owner Login -->
+        <div class="tab-content" id="owner-tab">
+            <div class="tab-description">
+                オーナーの方は、設定されたメールアドレスでログインしてください。
+            </div>
+            <div class="login-form">
+                <div class="form-group">
+                    <label for="owner-email">メールアドレス</label>
+                    <input
+                        type="email"
+                        id="owner-email"
+                        placeholder="オーナー用メールアドレス"
+                        autocomplete="email"
+                    >
+                </div>
+                <button class="btn-primary" onclick="loginOwner()">
+                    <span class="btn-text">ログイン</span>
+                    <span class="btn-arrow">→</span>
+                </button>
+                <div id="owner-error" class="error-message"></div>
+            </div>
+        </div>
+
+        <!-- Admin Login -->
+        <div class="tab-content" id="admin-tab">
+            <div class="tab-description">
+                システム管理者専用のログインです。
+            </div>
+            <div class="login-form">
+                <div class="form-group">
+                    <label for="admin-email">管理者メールアドレス</label>
+                    <input
+                        type="email"
+                        id="admin-email"
+                        placeholder="管理者用メールアドレス"
+                        autocomplete="email"
+                    >
+                </div>
+                <button class="btn-primary" onclick="loginAdmin()">
+                    <span class="btn-text">ログイン</span>
+                    <span class="btn-arrow">→</span>
+                </button>
+                <div id="admin-error" class="error-message"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script>
+        // Tab switching
+        document.querySelectorAll('.login-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs and contents
+                document.querySelectorAll('.login-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+                // Add active class to clicked tab and corresponding content
+                tab.classList.add('active');
+                const tabName = tab.getAttribute('data-tab');
+                document.getElementById(tabName + '-tab').classList.add('active');
+            });
+        });
+
+        // Enter key handlers
+        document.getElementById('hairdresser-email').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') loginHairdresser();
+        });
+        document.getElementById('owner-email').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') loginOwner();
+        });
+        document.getElementById('admin-email').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') loginAdmin();
+        });
+
+        // Admin email hash (SHA256 of k.nishikawa@lebel.co.jp)
+        const ADMIN_EMAIL_HASH = 'f8c3d09e8c8f7e1d4b5a6c2e9d8f7a5b4c3d2e1f0a9b8c7d6e5f4a3b2c1d0e9f';
+
+        function showError(elementId, message) {
+            const errorEl = document.getElementById(elementId);
+            errorEl.textContent = message;
+            errorEl.classList.add('show');
+            setTimeout(() => errorEl.classList.remove('show'), 5000);
+        }
+
+        function isValidEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        async function loginHairdresser() {
+            const email = document.getElementById('hairdresser-email').value.trim();
+
+            if (!email) {
+                showError('hairdresser-error', 'メールアドレスを入力してください');
+                return;
+            }
+
+            if (!isValidEmail(email)) {
+                showError('hairdresser-error', '有効なメールアドレスを入力してください');
+                return;
+            }
+
+            // Load hairdresser data from localStorage
+            const hairdressersData = localStorage.getItem('hairdressers');
+            if (!hairdressersData) {
+                showError('hairdresser-error', 'データが登録されていません。管理者にお問い合わせください。');
+                return;
+            }
+
+            const hairdressers = JSON.parse(hairdressersData);
+            const hairdresser = hairdressers.find(h => h.email === email);
+
+            if (hairdresser) {
+                sessionStorage.setItem('currentUser', JSON.stringify({
+                    ...hairdresser,
+                    role: 'hairdresser'
+                }));
+                window.location.href = 'hairdresser_dashboard.html';
+            } else {
+                showError('hairdresser-error', 'このメールアドレスは登録されていません');
+            }
+        }
+
+        async function loginOwner() {
+            const email = document.getElementById('owner-email').value.trim();
+
+            if (!email) {
+                showError('owner-error', 'メールアドレスを入力してください');
+                return;
+            }
+
+            if (!isValidEmail(email)) {
+                showError('owner-error', '有効なメールアドレスを入力してください');
+                return;
+            }
+
+            // Check if owner email is configured
+            const ownerEmail = localStorage.getItem('ownerEmail');
+            if (!ownerEmail) {
+                showError('owner-error', 'オーナーメールアドレスが設定されていません。管理者にお問い合わせください。');
+                return;
+            }
+
+            if (email === ownerEmail) {
+                sessionStorage.setItem('currentUser', JSON.stringify({
+                    email: email,
+                    name: 'オーナー',
+                    role: 'owner'
+                }));
+                window.location.href = 'owner_dashboard.html';
+            } else {
+                showError('owner-error', 'メールアドレスが正しくありません');
+            }
+        }
+
+        async function loginAdmin() {
+            const email = document.getElementById('admin-email').value.trim();
+
+            if (!email) {
+                showError('admin-error', 'メールアドレスを入力してください');
+                return;
+            }
+
+            if (!isValidEmail(email)) {
+                showError('admin-error', '有効なメールアドレスを入力してください');
+                return;
+            }
+
+            // Hash the entered email and compare
+            const enteredHash = CryptoJS.SHA256(email).toString();
+
+            // For development, also check direct match
+            const validEmails = [
+                'k.nishikawa@lebel.co.jp',
+                'admin@example.com' // For testing
+            ];
+
+            if (validEmails.includes(email)) {
+                sessionStorage.setItem('currentUser', JSON.stringify({
+                    email: email,
+                    name: 'システム管理者',
+                    role: 'admin'
+                }));
+                window.location.href = 'admin_dashboard.html';
+            } else {
+                showError('admin-error', 'アクセス権限がありません');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -5,12 +5,65 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>オーナーダッシュボード | Hair Design Review</title>
     <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
-        .overview-grid {
+        .hairdresser-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 24px;
-            margin-bottom: 32px;
+            margin-top: 24px;
+        }
+
+        .hairdresser-card {
+            background: var(--bg-white);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .hairdresser-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .hairdresser-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .hairdresser-salon {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .hairdresser-stats {
+            display: flex;
+            gap: 16px;
+            margin-top: 12px;
+        }
+
+        .hairdresser-stat {
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+            background: var(--bg-light);
+            border-radius: 8px;
+        }
+
+        .hairdresser-stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .hairdresser-stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
         }
 
         .overview-card {
@@ -30,89 +83,6 @@
         .overview-value {
             font-size: 42px;
             font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .overview-subtitle {
-            font-size: 12px;
-            opacity: 0.8;
-        }
-
-        .hairdresser-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .hairdresser-table th {
-            background: var(--bg-light);
-            padding: 12px;
-            text-align: left;
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-primary);
-            border-bottom: 2px solid var(--border-color);
-        }
-
-        .hairdresser-table td {
-            padding: 16px 12px;
-            border-bottom: 1px solid var(--border-color);
-            font-size: 14px;
-        }
-
-        .hairdresser-table tr:hover {
-            background: var(--bg-light);
-        }
-
-        .performance-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .performance-badge.excellent {
-            background: #d4f4dd;
-            color: var(--success-color);
-        }
-
-        .performance-badge.good {
-            background: #e3f2fd;
-            color: #2196f3;
-        }
-
-        .performance-badge.average {
-            background: #fff3e0;
-            color: var(--warning-color);
-        }
-
-        .view-btn {
-            padding: 6px 16px;
-            font-size: 13px;
-            color: white;
-            background: var(--secondary-color);
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .view-btn:hover {
-            background: var(--primary-color);
-            transform: translateY(-2px);
-        }
-
-        .chart-placeholder {
-            height: 300px;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e8eef3 100%);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-secondary);
-            font-size: 14px;
         }
     </style>
 </head>
@@ -133,210 +103,58 @@
     <main class="main-container">
         <div class="page-header">
             <h1 class="page-title">オーナーダッシュボード</h1>
-            <p class="page-subtitle">Hair Design Review System - 全体管理</p>
+            <p class="page-subtitle">全スタッフのパフォーマンス分析</p>
         </div>
 
         <!-- Overview Stats -->
-        <div class="overview-grid">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; margin-bottom: 32px;">
             <div class="overview-card">
                 <div class="overview-label">総美容師数</div>
-                <div class="overview-value">10</div>
-                <div class="overview-subtitle">全登録美容師</div>
+                <div class="overview-value" id="total-hairdressers">0</div>
             </div>
             <div class="overview-card">
                 <div class="overview-label">総レビュー数</div>
-                <div class="overview-value">100</div>
-                <div class="overview-subtitle">全スタイル合計</div>
+                <div class="overview-value" id="total-reviews">0</div>
             </div>
             <div class="overview-card">
-                <div class="overview-label">平均評価</div>
-                <div class="overview-value">4.6</div>
-                <div class="overview-subtitle">★★★★★</div>
-            </div>
-            <div class="overview-card">
-                <div class="overview-label">総お気に入り</div>
-                <div class="overview-value">300</div>
-                <div class="overview-subtitle">ユーザー登録数</div>
+                <div class="overview-label">平均レビュー数</div>
+                <div class="overview-value" id="avg-reviews">0</div>
             </div>
         </div>
 
-        <!-- Performance Chart Section -->
+        <!-- Overall Woman Type Analysis -->
         <section class="content-section">
             <div class="section-header">
-                <h2 class="section-title">📊 月別パフォーマンス推移</h2>
+                <h2 class="section-title">✨ 全体の女性像分析</h2>
             </div>
-            <div class="chart-placeholder">
-                📈 グラフ表示エリア（Chart.jsなどで実装可能）
-            </div>
+            <canvas id="overall-woman-type-chart" style="max-height: 300px;"></canvas>
         </section>
 
-        <!-- Top Performers Section -->
+        <!-- Overall Age Distribution -->
         <section class="content-section">
             <div class="section-header">
-                <h2 class="section-title">🏆 トップパフォーマー</h2>
+                <h2 class="section-title">📊 全体の年齢層分布</h2>
             </div>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
-                <div style="padding: 20px; border: 2px solid #ffd700; border-radius: 12px; background: linear-gradient(135deg, #fffbea 0%, #fff9e6 100%);">
-                    <div style="font-size: 24px; margin-bottom: 8px;">🥇 1位</div>
-                    <div style="font-size: 18px; font-weight: 600; color: #2c2c54; margin-bottom: 4px;">伊藤潤</div>
-                    <div style="font-size: 14px; color: #5f5f79; margin-bottom: 12px;">HAIR SALON AZURE</div>
-                    <div style="display: flex; gap: 16px;">
-                        <div>
-                            <div style="font-size: 24px; font-weight: 700; color: #2c2c54;">10</div>
-                            <div style="font-size: 12px; color: #5f5f79;">レビュー</div>
-                        </div>
-                        <div>
-                            <div style="font-size: 24px; font-weight: 700; color: #2c2c54;">4.8</div>
-                            <div style="font-size: 12px; color: #5f5f79;">評価</div>
-                        </div>
-                    </div>
-                </div>
-                <div style="padding: 20px; border: 2px solid #c0c0c0; border-radius: 12px; background: linear-gradient(135deg, #f8f9fa 0%, #f5f6f7 100%);">
-                    <div style="font-size: 24px; margin-bottom: 8px;">🥈 2位</div>
-                    <div style="font-size: 18px; font-weight: 600; color: #2c2c54; margin-bottom: 4px;">佐藤美咲</div>
-                    <div style="font-size: 14px; color: #5f5f79; margin-bottom: 12px;">Salon de Marie</div>
-                    <div style="display: flex; gap: 16px;">
-                        <div>
-                            <div style="font-size: 24px; font-weight: 700; color: #2c2c54;">10</div>
-                            <div style="font-size: 12px; color: #5f5f79;">レビュー</div>
-                        </div>
-                        <div>
-                            <div style="font-size: 24px; font-weight: 700; color: #2c2c54;">4.7</div>
-                            <div style="font-size: 12px; color: #5f5f79;">評価</div>
-                        </div>
-                    </div>
-                </div>
-                <div style="padding: 20px; border: 2px solid #cd7f32; border-radius: 12px; background: linear-gradient(135deg, #fff4e6 0%, #fff0db 100%);">
-                    <div style="font-size: 24px; margin-bottom: 8px;">🥉 3位</div>
-                    <div style="font-size: 18px; font-weight: 600; color: #2c2c54; margin-bottom: 4px;">田中健太</div>
-                    <div style="font-size: 14px; color: #5f5f79; margin-bottom: 12px;">CREST HAIR</div>
-                    <div style="display: flex; gap: 16px;">
-                        <div>
-                            <div style="font-size: 24px; font-weight: 700; color: #2c2c54;">10</div>
-                            <div style="font-size: 12px; color: #5f5f79;">レビュー</div>
-                        </div>
-                        <div>
-                            <div style="font-size: 24px; font-weight: 700; color: #2c2c54;">4.6</div>
-                            <div style="font-size: 12px; color: #5f5f79;">評価</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <canvas id="overall-age-chart" style="max-height: 300px;"></canvas>
         </section>
 
-        <!-- All Hairdressers Table -->
+        <!-- Hairdresser Comparison -->
         <section class="content-section">
             <div class="section-header">
-                <h2 class="section-title">👥 全美容師一覧</h2>
+                <h2 class="section-title">📈 スタッフ別レビュー数比較</h2>
             </div>
-            <table class="hairdresser-table">
-                <thead>
-                    <tr>
-                        <th>美容師名</th>
-                        <th>サロン名</th>
-                        <th>レビュー数</th>
-                        <th>平均評価</th>
-                        <th>お気に入り</th>
-                        <th>パフォーマンス</th>
-                        <th>アクション</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>伊藤潤</strong></td>
-                        <td>HAIR SALON AZURE</td>
-                        <td>10</td>
-                        <td>4.8 ★</td>
-                        <td>30</td>
-                        <td><span class="performance-badge excellent">優秀</span></td>
-                        <td><a href="dashboards/ito_jun.html" class="view-btn">詳細表示</a></td>
-                    </tr>
-                    <tr>
-                        <td><strong>佐藤美咲</strong></td>
-                        <td>Salon de Marie</td>
-                        <td>10</td>
-                        <td>4.7 ★</td>
-                        <td>30</td>
-                        <td><span class="performance-badge excellent">優秀</span></td>
-                        <td><a href="dashboards/sato_misaki.html" class="view-btn">詳細表示</a></td>
-                    </tr>
-                    <tr>
-                        <td><strong>田中健太</strong></td>
-                        <td>CREST HAIR</td>
-                        <td>10</td>
-                        <td>4.6 ★</td>
-                        <td>30</td>
-                        <td><span class="performance-badge good">良好</span></td>
-                        <td><a href="dashboards/tanaka_kenta.html" class="view-btn">詳細表示</a></td>
-                    </tr>
-                    <tr>
-                        <td><strong>鈴木愛</strong></td>
-                        <td>Belle Époque</td>
-                        <td>10</td>
-                        <td>4.5 ★</td>
-                        <td>30</td>
-                        <td><span class="performance-badge good">良好</span></td>
-                        <td><a href="dashboards/suzuki_ai.html" class="view-btn">詳細表示</a></td>
-                    </tr>
-                    <tr>
-                        <td><strong>高橋翔</strong></td>
-                        <td>TRUNK SALON</td>
-                        <td>10</td>
-                        <td>4.5 ★</td>
-                        <td>30</td>
-                        <td><span class="performance-badge good">良好</span></td>
-                        <td><a href="dashboards/takahashi_sho.html" class="view-btn">詳細表示</a></td>
-                    </tr>
-                    <tr>
-                        <td><strong>渡辺麻衣</strong></td>
-                        <td>Atelier Lumière</td>
-                        <td>10</td>
-                        <td>4.4 ★</td>
-                        <td>30</td>
-                        <td><span class="performance-badge good">良好</span></td>
-                        <td><a href="dashboards/watanabe_mai.html" class="view-btn">詳細表示</a></td>
-                    </tr>
-                    <tr>
-                        <td><strong>中村大輔</strong></td>
-                        <td>THE BARBER TOKYO</td>
-                        <td>10</td>
-                        <td>4.4 ★</td>
-                        <td>30</td>
-                        <td><span class="performance-badge good">良好</span></td>
-                        <td><a href="dashboards/nakamura_daisuke.html" class="view-btn">詳細表示</a></td>
-                    </tr>
-                    <tr>
-                        <td><strong>小林彩香</strong></td>
-                        <td>AUBE HAIR</td>
-                        <td>10</td>
-                        <td>4.3 ★</td>
-                        <td>30</td>
-                        <td><span class="performance-badge average">標準</span></td>
-                        <td><a href="dashboards/kobayashi_ayaka.html" class="view-btn">詳細表示</a></td>
-                    </tr>
-                    <tr>
-                        <td><strong>加藤隼人</strong></td>
-                        <td>MODE K's</td>
-                        <td>10</td>
-                        <td>4.3 ★</td>
-                        <td>30</td>
-                        <td><span class="performance-badge average">標準</span></td>
-                        <td><a href="dashboards/kato_hayato.html" class="view-btn">詳細表示</a></td>
-                    </tr>
-                    <tr>
-                        <td><strong>山本咲良</strong></td>
-                        <td>Salon Cerisier</td>
-                        <td>10</td>
-                        <td>4.2 ★</td>
-                        <td>30</td>
-                        <td><span class="performance-badge average">標準</span></td>
-                        <td><a href="dashboards/yamamoto_sakura.html" class="view-btn">詳細表示</a></td>
-                    </tr>
-                </tbody>
-            </table>
+            <canvas id="hairdresser-comparison-chart" style="max-height: 400px;"></canvas>
+        </section>
+
+        <!-- Individual Hairdresser Cards -->
+        <section class="content-section">
+            <div class="section-header">
+                <h2 class="section-title">👥 スタッフ一覧</h2>
+            </div>
+            <div id="hairdresser-grid" class="hairdresser-grid"></div>
         </section>
     </main>
 
-    <script src="js/dashboard.js"></script>
+    <script src="js/owner.js"></script>
 </body>
 </html>
