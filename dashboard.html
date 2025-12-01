@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>西川 啓太 - ダッシュボード | Hair Design Review</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="dashboard-page">
+    <header class="header">
+        <div class="header-content">
+            <div class="header-logo">
+                <span class="logo-text">id</span>
+                <span class="logo-year">2025</span>
+            </div>
+            <div class="header-user">
+                <span class="user-name">西川 啓太</span>
+                <button class="logout-btn" onclick="logout()">ログアウト</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <div class="page-header">
+            <h1 class="page-title">ダッシュボード</h1>
+            <p class="page-subtitle">西川美容室 - 投稿スタイルの分析とレビュー</p>
+        </div>
+
+        <!-- Stats Section -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">総レビュー数</div>
+                <div class="stat-value">47</div>
+                <div class="stat-change positive">
+                    ↑ 12% 先月比
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">平均評価</div>
+                <div class="stat-value">4.6</div>
+                <div class="stat-change positive">
+                    ↑ 0.3 先月比
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">お気に入り登録</div>
+                <div class="stat-value">128</div>
+                <div class="stat-change positive">
+                    ↑ 24% 先月比
+                </div>
+            </div>
+        </div>
+
+        <!-- Current Design Section -->
+        <section class="content-section">
+            <div class="section-header">
+                <h2 class="section-title">最新の投稿スタイル</h2>
+            </div>
+
+            <div class="design-card">
+                <img
+                    src="images/hair_design_001.jpg"
+                    alt="10代向けヘアスタイル"
+                    class="design-image"
+                    onerror="this.src='https://via.placeholder.com/800x600/706fd3/ffffff?text=ヘアデザイン'"
+                >
+                <div class="design-info">
+                    <div class="design-meta">
+                        <div>
+                            <div class="design-date">投稿日: 2025年12月1日</div>
+                            <div style="margin-top: 8px; font-size: 14px; color: #5f5f79;">
+                                <strong>対象年齢層:</strong> 10代
+                            </div>
+                        </div>
+                        <span class="design-status active">レビュー受付中</span>
+                    </div>
+
+                    <div class="design-stats">
+                        <div class="design-stat">
+                            <div class="design-stat-value">47</div>
+                            <div class="design-stat-label">レビュー数</div>
+                        </div>
+                        <div class="design-stat">
+                            <div class="design-stat-value">4.6</div>
+                            <div class="design-stat-label">平均評価</div>
+                        </div>
+                        <div class="design-stat">
+                            <div class="design-stat-value">128</div>
+                            <div class="design-stat-label">お気に入り</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Reviews Section -->
+        <section class="content-section">
+            <div class="section-header">
+                <h2 class="section-title">最近のレビュー</h2>
+            </div>
+
+            <div class="reviews-list">
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-rating">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                        </div>
+                        <div class="review-date">2025年12月1日</div>
+                    </div>
+                    <p class="review-text">
+                        とても素敵なスタイルですね！10代らしい爽やかさと個性が両立していて、娘に似合いそうです。カラーリングも自然で素敵です。
+                    </p>
+                </div>
+
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-rating">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                        </div>
+                        <div class="review-date">2025年11月30日</div>
+                    </div>
+                    <p class="review-text">
+                        若々しくてトレンド感のあるデザインです。娘がこのようなスタイルにしたいと言っています。西川美容室さんのセンスはいつも素晴らしいですね。
+                    </p>
+                </div>
+
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-rating">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star empty">★</span>
+                        </div>
+                        <div class="review-date">2025年11月29日</div>
+                    </div>
+                    <p class="review-text">
+                        可愛らしいスタイルで、10代の女の子にぴったりだと思います。もう少し詳しいスタイリング方法の説明があると嬉しいです。
+                    </p>
+                </div>
+
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-rating">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                        </div>
+                        <div class="review-date">2025年11月28日</div>
+                    </div>
+                    <p class="review-text">
+                        フレッシュで明るいイメージのヘアスタイルですね。学校にも馴染みやすそうで、親としても安心できるデザインです。
+                    </p>
+                </div>
+
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-rating">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                        </div>
+                        <div class="review-date">2025年11月27日</div>
+                    </div>
+                    <p class="review-text">
+                        清潔感があって、とても好印象です。娘の卒業式にこのようなスタイルを検討したいと思います。西川美容室の技術力の高さが伝わってきます。
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stylist Info Section -->
+        <section class="content-section">
+            <div class="section-header">
+                <h2 class="section-title">美容師情報</h2>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                <div>
+                    <div style="font-size: 14px; color: #5f5f79; margin-bottom: 4px;">お名前</div>
+                    <div style="font-size: 16px; font-weight: 600; color: #2c2c54;">西川 啓太</div>
+                </div>
+                <div>
+                    <div style="font-size: 14px; color: #5f5f79; margin-bottom: 4px;">店舗名</div>
+                    <div style="font-size: 16px; font-weight: 600; color: #2c2c54;">西川美容室</div>
+                </div>
+                <div>
+                    <div style="font-size: 14px; color: #5f5f79; margin-bottom: 4px;">メールアドレス</div>
+                    <div style="font-size: 16px; font-weight: 600; color: #2c2c54;">k.nishikawa@lebel.co.jp</div>
+                </div>
+                <div>
+                    <div style="font-size: 14px; color: #5f5f79; margin-bottom: 4px;">対象年齢層</div>
+                    <div style="font-size: 16px; font-weight: 600; color: #2c2c54;">10代</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="js/dashboard.js"></script>
+</body>
+</html>
