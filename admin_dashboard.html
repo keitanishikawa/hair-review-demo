@@ -253,7 +253,11 @@
     <div class="header">
         <div class="header-content">
             <div class="header-title">⚙️ 管理者ダッシュボード</div>
-            <button class="logout-btn" onclick="logout()">ログアウト</button>
+            <div style="display: flex; gap: 8px;">
+                <button class="logout-btn" onclick="refreshData()" style="background: rgba(46, 213, 115, 0.3);">🔄 更新</button>
+                <button class="logout-btn" onclick="confirmReset()" style="background: rgba(255, 71, 87, 0.3);">🗑️ リセット</button>
+                <button class="logout-btn" onclick="logout()">ログアウト</button>
+            </div>
         </div>
     </div>
 

@@ -19,6 +19,18 @@ function logout() {
     window.location.href = 'login.html';
 }
 
+function refreshData() {
+    location.reload();
+}
+
+function confirmReset() {
+    if (confirm('⚠️ 警告\n\nすべてのデータ（美容師情報、アンケート、画像、オーナー設定）を削除しますか？\n\nこの操作は取り消せません。')) {
+        localStorage.clear();
+        alert('✅ すべてのデータをリセットしました');
+        location.reload();
+    }
+}
+
 function loadSystemStatus() {
     // Load hairdresser count
     const hairdressers = JSON.parse(localStorage.getItem('hairdressers') || '[]');

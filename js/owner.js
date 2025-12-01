@@ -21,10 +21,20 @@ function logout() {
     window.location.href = 'login.html';
 }
 
+function refreshData() {
+    location.reload();
+}
+
 function loadOwnerDashboard() {
     // Load data from localStorage
     hairdressers = JSON.parse(localStorage.getItem('hairdressers') || '[]');
     allSurveys = JSON.parse(localStorage.getItem('surveys') || '[]');
+
+    // デバッグ情報をコンソールに出力
+    console.log('🔍 オーナーダッシュボード - データ読み込み結果:');
+    console.log('- 美容師数:', hairdressers.length);
+    console.log('- アンケート数:', allSurveys.length);
+    console.log('- 美容師データ:', hairdressers);
 
     if (hairdressers.length === 0) {
         document.querySelector('.main-container').innerHTML = `
@@ -36,6 +46,14 @@ function loadOwnerDashboard() {
                 <p style="color: var(--text-secondary); margin-bottom: 24px;">
                     管理者にデータのアップロードを依頼してください
                 </p>
+                <div style="background: #f0f4ff; padding: 16px; border-radius: 8px; margin: 20px auto; max-width: 500px;">
+                    <div style="font-size: 14px; color: #666; text-align: left;">
+                        <strong>📝 確認事項：</strong><br><br>
+                        1. 管理者画面でCSVをアップロードしましたか？<br>
+                        2. アップロード後、「🔄 更新」ボタンを押してください<br>
+                        3. ブラウザのコンソール（F12キー）でデータを確認できます
+                    </div>
+                </div>
             </div>
         `;
         return;

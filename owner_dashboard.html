@@ -91,7 +91,10 @@
         <div class="header-content">
             <div class="header-user">
                 <span class="user-name">👑 オーナー</span>
-                <button class="logout-btn" onclick="logout()">ログアウト</button>
+                <div style="display: flex; gap: 8px;">
+                    <button class="logout-btn" onclick="refreshData()" style="background: rgba(46, 213, 115, 0.3);">🔄 更新</button>
+                    <button class="logout-btn" onclick="logout()">ログアウト</button>
+                </div>
             </div>
         </div>
     </header>
