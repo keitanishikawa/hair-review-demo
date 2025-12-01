@@ -1,4 +1,4 @@
-// Hairdresser Dashboard JavaScript - Educational Feedback System
+// Hairdresser Dashboard JavaScript - Premium Design
 
 let currentUser = null;
 let myReviews = [];
@@ -6,11 +6,11 @@ let allHairdressers = [];
 let allSurveys = [];
 let charts = {};
 
-// Colorful color schemes
+// Premium Color Palette
 const COLOR_PALETTE = {
-    primary: ['#667eea', '#764ba2', '#9b59b6', '#8e44ad'],
-    gradient: ['#667eea', '#764ba2', '#f093fb', '#f5576c'],
-    accent: ['#f093fb', '#ff6b9d', '#ffa8a8', '#20e3b2'],
+    primary: ['#667eea', '#764ba2', '#9b59b6', '#8e44ad', '#6C5CE7'],
+    gradient: ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#feca57'],
+    accent: ['#f093fb', '#ff6b9d', '#ffa8a8', '#20e3b2', '#48dbfb'],
     full: ['#667eea', '#764ba2', '#9b59b6', '#f093fb', '#ff6b9d', '#20e3b2', '#feca57', '#48dbfb', '#0abde3'],
     occupation: ['#667eea', '#764ba2', '#f093fb', '#ff6b9d', '#feca57', '#48dbfb', '#0abde3', '#00d2d3'],
     womanType: ['#FFB6C1', '#FFC0CB', '#C8A2C8', '#9370DB', '#DDA0DD', '#E6E6FA']
@@ -45,10 +45,10 @@ function logout() {
 }
 
 function setupTabs() {
-    const tabs = document.querySelectorAll('.tab');
+    const tabs = document.querySelectorAll('.tab-btn');
     tabs.forEach(tab => {
         tab.addEventListener('click', () => {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             tab.classList.add('active');
             const tabName = tab.getAttribute('data-tab');
@@ -76,10 +76,10 @@ function loadDashboardData() {
     if (myReviews.length > 0) {
         analyzeAndDisplay();
     } else {
-        document.querySelector('.main-content').innerHTML += `
-            <div style="text-align: center; padding: 60px 20px; color: #999;">
-                <div style="font-size: 48px; margin-bottom: 16px;">📊</div>
-                <p>まだレビューがありません</p>
+        document.querySelector('.main-content').innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">📊</div>
+                <div class="empty-text">まだレビューがありません</div>
             </div>
         `;
     }
@@ -106,15 +106,13 @@ function analyzeAndDisplay() {
     // Generate target recommendation
     generateTargetRecommendation();
 
-    // Create all charts
+    // Create all charts - ALL DOUGHNUT/PIE CHARTS
     createAgeChart();
     createWomanTypeChart();
     createOccupationChart();
     createMaritalChart();
     createChildrenChart();
-    createCrossAnalysisChart();
     createComparisonAnalysis();
-    displayReviews();
 }
 
 function generateTargetRecommendation() {
@@ -130,52 +128,61 @@ function generateTargetRecommendation() {
     const targetAge = currentUser.targetAge ? parseInt(currentUser.targetAge) : avgAge;
     const ageDiff = Math.abs(avgAge - targetAge);
 
-    let recommendationHtml = '<div class="recommendation-title">📍 データから見るあなたの強み</div>';
+    let recommendationHtml = '';
 
-    recommendationHtml += '<div class="recommendation-text">';
-    recommendationHtml += `あなたの作品は主に<strong>${analysis.topAge.label}</strong>の`;
+    // Main insight
+    recommendationHtml += `
+        <div style="font-size: 17px; margin-bottom: 20px; font-weight: 500;">
+            あなたの作品は主に<span class="insight-highlight">${analysis.topAge.label}</span>の`;
+
     if (analysis.topWomanType.value) {
-        recommendationHtml += `<strong>${analysis.topWomanType.value}</strong>タイプの女性に支持されています。`;
+        recommendationHtml += `<span class="insight-highlight">${analysis.topWomanType.value}</span>タイプの女性に支持されています。`;
     } else {
         recommendationHtml += `女性に支持されています。`;
     }
-
-    if (analysis.topOccupation.value) {
-        recommendationHtml += `<br>職業では<strong>${analysis.topOccupation.value}</strong>の方が最も多く選んでいます。`;
-    }
     recommendationHtml += '</div>';
 
-    // Target alignment insight
+    // Insight boxes
+    recommendationHtml += '<div class="insight-boxes">';
+
+    // Target alignment
     if (ageDiff <= 3) {
         recommendationHtml += `
             <div class="insight-box">
-                <div class="insight-label">✅ ターゲット適合度: 高い</div>
-                あなたのターゲット年齢(${targetAge}歳)と実際の顧客層(平均${avgAge}歳)がマッチしています！
-                この顧客層に向けたスタイル提案を続けることで、さらに支持を獲得できるでしょう。
+                <div class="insight-box-title">✅ ターゲット適合度</div>
+                <div class="insight-box-value">優秀！ (差: ${ageDiff}歳)</div>
             </div>
         `;
     } else {
         recommendationHtml += `
             <div class="insight-box">
-                <div class="insight-label">💡 改善の機会</div>
-                ターゲット年齢(${targetAge}歳)と実際の顧客層(平均${avgAge}歳)に${ageDiff}歳の差があります。
-                ${avgAge < targetAge ? '実際の顧客は若い層に集中' : '実際の顧客は年上の層に集中'}しています。
-                <strong>${analysis.topAge.label}</strong>に特化したスタイリングを強化するか、ターゲットを見直すことを検討しましょう。
+                <div class="insight-box-title">💡 改善の機会</div>
+                <div class="insight-box-value">差: ${ageDiff}歳</div>
             </div>
         `;
     }
 
-    // Actionable recommendations
-    recommendationHtml += `
-        <div class="insight-box">
-            <div class="insight-label">🎯 おすすめのターゲット設定</div>
-            データに基づくと、以下の顧客層をターゲットにすると効果的です：<br>
-            <strong>• 年齢:</strong> ${analysis.topAge.label}<br>
-            ${analysis.topWomanType.value ? `<strong>• 女性像:</strong> ${analysis.topWomanType.value}タイプ<br>` : ''}
-            ${analysis.topOccupation.value ? `<strong>• 職業:</strong> ${analysis.topOccupation.value}<br>` : ''}
-            ${analysis.topMarital.value ? `<strong>• 結婚:</strong> ${analysis.topMarital.value}<br>` : ''}
-        </div>
-    `;
+    // Top occupation
+    if (analysis.topOccupation.value && analysis.topOccupation.value !== '未回答') {
+        recommendationHtml += `
+            <div class="insight-box">
+                <div class="insight-box-title">💼 主な職業</div>
+                <div class="insight-box-value">${analysis.topOccupation.value}</div>
+            </div>
+        `;
+    }
+
+    // Top marital status
+    if (analysis.topMarital.value && analysis.topMarital.value !== '未回答') {
+        recommendationHtml += `
+            <div class="insight-box">
+                <div class="insight-box-title">💍 主な層</div>
+                <div class="insight-box-value">${analysis.topMarital.value}</div>
+            </div>
+        `;
+    }
+
+    recommendationHtml += '</div>';
 
     document.getElementById('target-recommendation').innerHTML = recommendationHtml;
 }
@@ -227,15 +234,23 @@ function createAgeChart() {
             labels: Object.keys(ageGroups),
             datasets: [{
                 data: Object.values(ageGroups),
-                backgroundColor: COLOR_PALETTE.gradient
+                backgroundColor: COLOR_PALETTE.gradient,
+                borderWidth: 3,
+                borderColor: '#fff'
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: true,
             plugins: {
-                legend: { display: false }
-            }
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(0,0,0,0.8)',
+                    padding: 12,
+                    cornerRadius: 8
+                }
+            },
+            cutout: '60%'
         }
     });
 
@@ -256,15 +271,23 @@ function createWomanTypeChart() {
             labels: Object.keys(womanTypes),
             datasets: [{
                 data: Object.values(womanTypes),
-                backgroundColor: COLOR_PALETTE.womanType
+                backgroundColor: COLOR_PALETTE.womanType,
+                borderWidth: 3,
+                borderColor: '#fff'
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: true,
             plugins: {
-                legend: { display: false }
-            }
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(0,0,0,0.8)',
+                    padding: 12,
+                    cornerRadius: 8
+                }
+            },
+            cutout: '60%'
         }
     });
 
@@ -280,27 +303,28 @@ function createOccupationChart() {
 
     const ctx = document.getElementById('occupation-chart');
     charts.occupation = new Chart(ctx, {
-        type: 'bar',
+        type: 'doughnut',
         data: {
             labels: Object.keys(occupations),
             datasets: [{
-                label: '人数',
                 data: Object.values(occupations),
-                backgroundColor: COLOR_PALETTE.occupation
+                backgroundColor: COLOR_PALETTE.occupation,
+                borderWidth: 3,
+                borderColor: '#fff'
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: true,
             plugins: {
-                legend: { display: false }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: { stepSize: 1 }
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(0,0,0,0.8)',
+                    padding: 12,
+                    cornerRadius: 8
                 }
-            }
+            },
+            cutout: '60%'
         }
     });
 
@@ -316,20 +340,28 @@ function createMaritalChart() {
 
     const ctx = document.getElementById('marital-chart');
     charts.marital = new Chart(ctx, {
-        type: 'pie',
+        type: 'doughnut',
         data: {
             labels: Object.keys(marital),
             datasets: [{
                 data: Object.values(marital),
-                backgroundColor: COLOR_PALETTE.primary
+                backgroundColor: COLOR_PALETTE.primary,
+                borderWidth: 3,
+                borderColor: '#fff'
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: true,
             plugins: {
-                legend: { display: false }
-            }
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(0,0,0,0.8)',
+                    padding: 12,
+                    cornerRadius: 8
+                }
+            },
+            cutout: '60%'
         }
     });
 
@@ -345,79 +377,32 @@ function createChildrenChart() {
 
     const ctx = document.getElementById('children-chart');
     charts.children = new Chart(ctx, {
-        type: 'pie',
+        type: 'doughnut',
         data: {
             labels: Object.keys(children),
             datasets: [{
                 data: Object.values(children),
-                backgroundColor: COLOR_PALETTE.accent
+                backgroundColor: COLOR_PALETTE.accent,
+                borderWidth: 3,
+                borderColor: '#fff'
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: true,
             plugins: {
-                legend: { display: false }
-            }
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(0,0,0,0.8)',
+                    padding: 12,
+                    cornerRadius: 8
+                }
+            },
+            cutout: '60%'
         }
     });
 
     createLegend('children-legend', Object.keys(children), COLOR_PALETTE.accent);
-}
-
-function createCrossAnalysisChart() {
-    // Create occupation x womanType cross analysis
-    const crossData = {};
-
-    myReviews.forEach(review => {
-        const occ = review.occupation || '未回答';
-        const woman = review.womanType || '未回答';
-
-        if (!crossData[occ]) crossData[occ] = {};
-        crossData[occ][woman] = (crossData[occ][woman] || 0) + 1;
-    });
-
-    // Prepare data for grouped bar chart
-    const occupations = Object.keys(crossData);
-    const womanTypes = [...new Set(myReviews.map(r => r.womanType || '未回答'))];
-
-    const datasets = womanTypes.map((type, idx) => ({
-        label: type,
-        data: occupations.map(occ => crossData[occ][type] || 0),
-        backgroundColor: COLOR_PALETTE.womanType[idx % COLOR_PALETTE.womanType.length]
-    }));
-
-    const ctx = document.getElementById('cross-chart');
-    charts.cross = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: occupations,
-            datasets: datasets
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            plugins: {
-                legend: {
-                    display: true,
-                    position: 'bottom'
-                },
-                title: {
-                    display: true,
-                    text: '職業 × 女性像 クロス分析'
-                }
-            },
-            scales: {
-                x: {
-                    stacked: false
-                },
-                y: {
-                    beginAtZero: true,
-                    ticks: { stepSize: 1 }
-                }
-            }
-        }
-    });
 }
 
 function createComparisonAnalysis() {
@@ -461,11 +446,11 @@ function createComparisonAnalysis() {
 
     // Review count comparison
     html += `
-        <div class="comparison-stat">
-            <div class="comparison-stat-title">📊 レビュー数</div>
+        <div class="comparison-item">
+            <div class="comparison-label">📊 レビュー数</div>
             <div class="comparison-bar">
                 <div class="comparison-bar-fill" style="width: ${(myStats.reviewCount / maxReviews * 100)}%">
-                    <span class="comparison-bar-label">${myStats.reviewCount}件</span>
+                    ${myStats.reviewCount}件
                 </div>
             </div>
             <div class="comparison-detail">
@@ -477,37 +462,26 @@ function createComparisonAnalysis() {
     // Target accuracy comparison
     if (myStats.targetAge > 0) {
         html += `
-            <div class="comparison-stat">
-                <div class="comparison-stat-title">🎯 ターゲット適合度</div>
+            <div class="comparison-item">
+                <div class="comparison-label">🎯 ターゲット適合度</div>
                 <div class="comparison-bar">
                     <div class="comparison-bar-fill" style="width: ${Math.max(10, 100 - myStats.ageDiff * 10)}%">
-                        <span class="comparison-bar-label">差: ${myStats.ageDiff}歳</span>
+                        差: ${myStats.ageDiff}歳
                     </div>
                 </div>
                 <div class="comparison-detail">
                     ${sortedByAccuracy.length}人中 ${accuracyRank}位
-                    ${myStats.ageDiff <= 3 ? '✅ 優秀！' : myStats.ageDiff <= 5 ? '⚠️ 改善の余地あり' : '❌ 要改善'}
+                    ${myStats.ageDiff <= 3 ? '✅ 優秀！' : myStats.ageDiff <= 5 ? '⚠️ 改善の余地あり' : '💡 要改善'}
                 </div>
             </div>
         `;
     }
 
-    // Age range comparison
-    html += `
-        <div class="comparison-stat">
-            <div class="comparison-stat-title">👥 平均顧客年齢</div>
-            <div class="comparison-detail" style="font-size: 14px; color: #333; margin-top: 8px;">
-                あなた: <strong>${myStats.avgAge}歳</strong> |
-                全体平均: ${Math.round(hairdresserStats.filter(s => s.avgAge > 0).reduce((sum, s) => sum + s.avgAge, 0) / hairdresserStats.filter(s => s.avgAge > 0).length)}歳
-            </div>
-        </div>
-    `;
-
     // Learning insights
     html += `
-        <div class="comparison-stat" style="border-left-color: #f093fb;">
-            <div class="comparison-stat-title">💡 改善のヒント</div>
-            <div style="font-size: 13px; line-height: 1.6; color: #555;">
+        <div class="comparison-item" style="border-left-color: #f093fb;">
+            <div class="comparison-label">💡 改善のヒント</div>
+            <div style="font-size: 14px; line-height: 1.7; color: #4a5568; margin-top: 8px;">
                 ${reviewRank === 1 ? '🏆 レビュー数1位！この調子でキープしましょう。' :
                   reviewRank <= 3 ? '⭐ 上位のパフォーマンス！さらなる成長を目指しましょう。' :
                   'より多くのレビューを獲得するため、顧客層に合わせたスタイル提案を強化しましょう。'}
@@ -526,25 +500,6 @@ function createLegend(elementId, labels, colors) {
         <div class="legend-item">
             <div class="legend-color" style="background: ${colors[i % colors.length]}"></div>
             <span>${label}</span>
-        </div>
-    `).join('');
-}
-
-function displayReviews() {
-    const reviewsList = document.getElementById('reviews-list');
-
-    if (myReviews.length === 0) {
-        reviewsList.innerHTML = '<p style="text-align: center; color: #999;">まだレビューがありません</p>';
-        return;
-    }
-
-    reviewsList.innerHTML = myReviews.slice(0, 20).map((review, i) => `
-        <div class="review-card">
-            <div class="review-meta">
-                #${i + 1} | ${review.age}歳 ${review.gender || ''} |
-                ${review.womanType || '-'} | ${review.occupation || '-'} |
-                ${review.maritalStatus || '-'} | ${normalizeChildStatus(review.hasChildren)}
-            </div>
         </div>
     `).join('');
 }

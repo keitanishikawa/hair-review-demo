@@ -256,6 +256,15 @@ function displayStaffCards() {
         const ageDiffDisplay = staff.ageDiff > 0 ? `+${staff.ageDiff}歳` : `${staff.ageDiff}歳`;
         const ageDiffColor = Math.abs(staff.ageDiff) > 5 ? '#f5576c' : '#20e3b2';
 
+        // Calculate percentages
+        const marriedRate = staff.reviewCount > 0 ? Math.round((staff.marriedCount / staff.reviewCount) * 100) : 0;
+        const childrenRate = staff.reviewCount > 0 ? Math.round((staff.hasChildrenCount / staff.reviewCount) * 100) : 0;
+
+        // Calculate target matching rate
+        const targetMatchRate = staff.targetAge && staff.avgAge > 0
+            ? Math.max(0, 100 - Math.abs(staff.ageDiff) * 10)
+            : 0;
+
         // Avatar with image or initials fallback
         const avatarHtml = imageUrl
             ? `<div class="staff-avatar" style="background-image: url('${imageUrl}'); background-size: cover; background-position: center;"></div>`
@@ -266,9 +275,8 @@ function displayStaffCards() {
                 <div class="staff-header">
                     ${avatarHtml}
                     <div class="staff-info">
-                        <div class="staff-name">${staff.name} (${staff.targetAge || '-'})</div>
+                        <div class="staff-name">${staff.name}</div>
                         <div class="staff-salon">${staff.salon}</div>
-                        <div class="staff-age">平均 ${staff.avgAge}歳</div>
                     </div>
                 </div>
                 <div class="staff-metrics">
@@ -278,29 +286,29 @@ function displayStaffCards() {
                     </div>
                     <div class="metric-box">
                         <div class="metric-value" style="font-size: 20px;">${staff.avgAge}歳</div>
-                        <div class="metric-label">顧客平均年齢</div>
+                        <div class="metric-label">獲得レビュー平均</div>
                     </div>
                 </div>
                 <div class="staff-details">
                     <div class="detail-item">
-                        <div class="detail-label">人気スタイル</div>
+                        <div class="detail-label">人気属性</div>
                         <div class="detail-value">${staff.popularStyle}</div>
                     </div>
                     <div class="detail-item">
-                        <div class="detail-label">既婚者数</div>
-                        <div class="detail-value">${staff.marriedCount}人</div>
+                        <div class="detail-label">既婚者</div>
+                        <div class="detail-value">${staff.marriedCount}人 (${marriedRate}%)</div>
                     </div>
                     <div class="detail-item">
-                        <div class="detail-label">子供あり</div>
-                        <div class="detail-value">${staff.hasChildrenCount}人</div>
+                        <div class="detail-label">子供いる</div>
+                        <div class="detail-value">${staff.hasChildrenCount}人 (${childrenRate}%)</div>
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">主な職業</div>
                         <div class="detail-value">${staff.popularOccupation}</div>
                     </div>
                     <div class="detail-item">
-                        <div class="detail-label">年齢差</div>
-                        <div class="detail-value" style="color: ${ageDiffColor};">${ageDiffDisplay}</div>
+                        <div class="detail-label">マッチング率</div>
+                        <div class="detail-value" style="color: ${ageDiffColor};">${targetMatchRate}%</div>
                     </div>
                 </div>
             </div>
