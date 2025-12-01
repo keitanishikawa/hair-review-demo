@@ -283,41 +283,78 @@ function handleSurveyCSV(file) {
     });
 }
 
-// Handle hairdresser data from textarea (copy-paste)
-function handleHairdresserData() {
+// Preview hairdresser data in table format
+let parsedHairdresserData = null;
+
+function previewHairdresserData() {
     const textarea = document.getElementById('hairdresser-data');
     const data = textarea.value.trim();
+    const previewDiv = document.getElementById('hairdresser-preview');
 
     if (!data) {
-        showMessage('hairdresser-success', 'データを入力してください', false);
+        previewDiv.style.display = 'none';
         return;
     }
 
     Papa.parse(data, {
         header: true,
-        delimiter: '\t', // Tab-separated for Excel copy-paste
+        delimiter: '\t',
         skipEmptyLines: true,
         complete: (results) => {
-            try {
-                // Also try comma-separated if tab-separated fails
-                if (!results.meta.fields || results.meta.fields.length < 5) {
-                    Papa.parse(data, {
-                        header: true,
-                        delimiter: ',',
-                        skipEmptyLines: true,
-                        complete: (retryResults) => {
-                            processHairdresserData(retryResults);
-                        }
-                    });
-                } else {
-                    processHairdresserData(results);
-                }
-            } catch (error) {
-                console.error('Parse error:', error);
-                showMessage('hairdresser-success', 'データの処理中にエラーが発生しました', false);
+            // Try comma if tab fails
+            if (!results.meta.fields || results.meta.fields.length < 5) {
+                Papa.parse(data, {
+                    header: true,
+                    delimiter: ',',
+                    skipEmptyLines: true,
+                    complete: (retryResults) => {
+                        displayHairdresserPreview(retryResults);
+                    }
+                });
+            } else {
+                displayHairdresserPreview(results);
             }
         }
     });
+}
+
+function displayHairdresserPreview(results) {
+    parsedHairdresserData = results;
+    const table = document.getElementById('hairdresser-preview-table');
+    const previewDiv = document.getElementById('hairdresser-preview');
+    const countSpan = document.getElementById('hairdresser-count-preview');
+
+    const headers = ['氏名', 'サロン名', 'メールアドレス', 'ターゲット年齢', '画像ファイル名'];
+
+    let html = '<thead><tr>';
+    headers.forEach(h => {
+        html += `<th style="padding: 12px; background: #667eea; color: white; text-align: left; border-bottom: 2px solid #fff; white-space: nowrap;">${h}</th>`;
+    });
+    html += '</tr></thead><tbody>';
+
+    results.data.forEach((row, i) => {
+        const bgColor = i % 2 === 0 ? '#f8f9fa' : '#ffffff';
+        html += `<tr style="background: ${bgColor};">`;
+        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${row.氏名 || row.name || '-'}</td>`;
+        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${row.サロン名 || row.salon || '-'}</td>`;
+        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${row.メールアドレス || row.email || '-'}</td>`;
+        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${row.ターゲット年齢 || row.target_age || row['ターゲット年齢'] || '-'}</td>`;
+        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0; font-family: monospace; font-size: 12px;">${row.画像ファイル名 || row.image_file || row['画像ファイル名'] || '-'}</td>`;
+        html += '</tr>';
+    });
+
+    html += '</tbody>';
+    table.innerHTML = html;
+    countSpan.textContent = results.data.length;
+    previewDiv.style.display = 'block';
+}
+
+function confirmHairdresserData() {
+    if (!parsedHairdresserData) {
+        showMessage('hairdresser-success', 'データが見つかりません', false);
+        return;
+    }
+    processHairdresserData(parsedHairdresserData);
 }
 
 function processHairdresserData(results) {
@@ -342,41 +379,80 @@ function processHairdresserData(results) {
     loadSystemStatus();
 }
 
-// Handle survey data from textarea (copy-paste)
-function handleSurveyData() {
+// Preview survey data in table format
+let parsedSurveyData = null;
+
+function previewSurveyData() {
     const textarea = document.getElementById('survey-data');
     const data = textarea.value.trim();
+    const previewDiv = document.getElementById('survey-preview');
 
     if (!data) {
-        showMessage('survey-success', 'データを入力してください', false);
+        previewDiv.style.display = 'none';
         return;
     }
 
     Papa.parse(data, {
         header: true,
-        delimiter: '\t', // Tab-separated for Excel copy-paste
+        delimiter: '\t',
         skipEmptyLines: true,
         complete: (results) => {
-            try {
-                // Also try comma-separated if tab-separated fails
-                if (!results.meta.fields || results.meta.fields.length < 7) {
-                    Papa.parse(data, {
-                        header: true,
-                        delimiter: ',',
-                        skipEmptyLines: true,
-                        complete: (retryResults) => {
-                            processSurveyData(retryResults);
-                        }
-                    });
-                } else {
-                    processSurveyData(results);
-                }
-            } catch (error) {
-                console.error('Parse error:', error);
-                showMessage('survey-success', 'データの処理中にエラーが発生しました', false);
+            // Try comma if tab fails
+            if (!results.meta.fields || results.meta.fields.length < 7) {
+                Papa.parse(data, {
+                    header: true,
+                    delimiter: ',',
+                    skipEmptyLines: true,
+                    complete: (retryResults) => {
+                        displaySurveyPreview(retryResults);
+                    }
+                });
+            } else {
+                displaySurveyPreview(results);
             }
         }
     });
+}
+
+function displaySurveyPreview(results) {
+    parsedSurveyData = results;
+    const table = document.getElementById('survey-preview-table');
+    const previewDiv = document.getElementById('survey-preview');
+    const countSpan = document.getElementById('survey-count-preview');
+
+    const headers = ['年齢', '都道府県', '性別', '結婚', '職業', '子供有無', '画像ファイル名'];
+
+    let html = '<thead><tr>';
+    headers.forEach(h => {
+        html += `<th style="padding: 12px; background: #667eea; color: white; text-align: left; border-bottom: 2px solid #fff; white-space: nowrap;">${h}</th>`;
+    });
+    html += '</tr></thead><tbody>';
+
+    results.data.forEach((row, i) => {
+        const bgColor = i % 2 === 0 ? '#f8f9fa' : '#ffffff';
+        html += `<tr style="background: ${bgColor};">`;
+        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${row.年齢 || row.age || '-'}</td>`;
+        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${row.都道府県 || row.prefecture || '-'}</td>`;
+        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${row.性別 || row.gender || '-'}</td>`;
+        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${row.結婚 || row.marital_status || row.結婚状態 || '-'}</td>`;
+        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${row.職業 || row.occupation || '-'}</td>`;
+        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${row.子供有無 || row.has_children || row['子供有無'] || '-'}</td>`;
+        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0; font-family: monospace; font-size: 12px;">${row.画像ファイル名 || row.imageFile || row['画像ファイル名'] || '-'}</td>`;
+        html += '</tr>';
+    });
+
+    html += '</tbody>';
+    table.innerHTML = html;
+    countSpan.textContent = results.data.length;
+    previewDiv.style.display = 'block';
+}
+
+function confirmSurveyData() {
+    if (!parsedSurveyData) {
+        showMessage('survey-success', 'データが見つかりません', false);
+        return;
+    }
+    processSurveyData(parsedSurveyData);
 }
 
 function processSurveyData(results) {

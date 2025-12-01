@@ -293,11 +293,19 @@
                 placeholder="氏名	サロン名	メールアドレス	ターゲット年齢	画像ファイル名
 田中太郎	Beauty Salon A	tanaka@example.com	30代	hair_design_001.jpg
 佐藤花子	Hair Studio B	sato@example.com	20代	hair_design_002.jpg"
-                style="width: 100%; min-height: 200px; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-family: monospace; font-size: 13px; resize: vertical;"
+                style="width: 100%; min-height: 120px; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-family: monospace; font-size: 13px; resize: vertical;"
+                oninput="previewHairdresserData()"
             ></textarea>
-            <button class="upload-btn" onclick="handleHairdresserData()" style="margin-top: 12px; width: 100%;">
-                ✅ データを登録
-            </button>
+            <div id="hairdresser-preview" style="margin-top: 16px; display: none;">
+                <h3 style="font-size: 14px; color: #666; margin-bottom: 8px;">📋 プレビュー（<span id="hairdresser-count-preview">0</span>件）</h3>
+                <div style="overflow-x: auto; border: 2px solid #667eea; border-radius: 8px; max-height: 400px; overflow-y: auto;">
+                    <table id="hairdresser-preview-table" style="width: 100%; border-collapse: collapse; background: white; font-size: 13px;">
+                    </table>
+                </div>
+                <button class="upload-btn" onclick="confirmHairdresserData()" style="margin-top: 12px; width: 100%;">
+                    ✅ このデータを登録
+                </button>
+            </div>
             <div id="hairdresser-success" class="success-message"></div>
         </div>
 
@@ -315,11 +323,19 @@
                 placeholder="年齢	都道府県	性別	結婚	職業	子供有無	画像ファイル名
 25	東京都	女性	未婚	会社員	無	hair_design_001.jpg
 32	大阪府	女性	既婚	主婦	有	hair_design_002.jpg"
-                style="width: 100%; min-height: 200px; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-family: monospace; font-size: 13px; resize: vertical;"
+                style="width: 100%; min-height: 120px; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-family: monospace; font-size: 13px; resize: vertical;"
+                oninput="previewSurveyData()"
             ></textarea>
-            <button class="upload-btn" onclick="handleSurveyData()" style="margin-top: 12px; width: 100%;">
-                ✅ データを登録
-            </button>
+            <div id="survey-preview" style="margin-top: 16px; display: none;">
+                <h3 style="font-size: 14px; color: #666; margin-bottom: 8px;">📋 プレビュー（<span id="survey-count-preview">0</span>件）</h3>
+                <div style="overflow-x: auto; border: 2px solid #667eea; border-radius: 8px; max-height: 400px; overflow-y: auto;">
+                    <table id="survey-preview-table" style="width: 100%; border-collapse: collapse; background: white; font-size: 13px;">
+                    </table>
+                </div>
+                <button class="upload-btn" onclick="confirmSurveyData()" style="margin-top: 12px; width: 100%;">
+                    ✅ このデータを登録
+                </button>
+            </div>
             <div id="survey-success" class="success-message"></div>
         </div>
 
