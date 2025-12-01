@@ -7,86 +7,328 @@
     <link rel="stylesheet" href="css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
-        .hairdresser-grid {
+        /* Tab Navigation */
+        .tab-navigation {
+            background: white;
+            border-radius: 16px;
+            padding: 12px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            border: none;
+            background: transparent;
+            color: #666;
+            font-size: 15px;
+            font-weight: 500;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn:hover {
+            background: #f5f7fa;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Staff Card Grid */
+        .staff-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 24px;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
             margin-top: 24px;
         }
 
-        .hairdresser-card {
-            background: var(--bg-white);
-            border-radius: 12px;
+        .staff-card {
+            background: white;
+            border-radius: 16px;
             padding: 24px;
-            box-shadow: var(--shadow-sm);
-            transition: all 0.3s ease;
-            border-left: 4px solid var(--secondary-color);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: all 0.3s;
         }
 
-        .hairdresser-card:hover {
+        .staff-card:hover {
             transform: translateY(-4px);
-            box-shadow: var(--shadow-md);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
         }
 
-        .hairdresser-name {
+        .staff-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .staff-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .staff-info {
+            flex: 1;
+        }
+
+        .staff-name {
             font-size: 18px;
             font-weight: 600;
-            color: var(--text-primary);
+            color: #333;
             margin-bottom: 4px;
         }
 
-        .hairdresser-salon {
+        .staff-age {
+            font-size: 13px;
+            color: #999;
+        }
+
+        .staff-salon {
             font-size: 14px;
-            color: var(--text-secondary);
+            color: #666;
+        }
+
+        .staff-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
             margin-bottom: 16px;
         }
 
-        .hairdresser-stats {
+        .metric-box {
+            background: #f8f9fc;
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 4px;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .staff-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            padding-top: 16px;
+            border-top: 1px solid #eee;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .detail-label {
+            font-size: 11px;
+            color: #999;
+        }
+
+        .detail-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        /* Search and Filter */
+        .search-filter-bar {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
             display: flex;
             gap: 16px;
-            margin-top: 12px;
+            flex-wrap: wrap;
+            align-items: center;
         }
 
-        .hairdresser-stat {
+        .search-box {
             flex: 1;
-            text-align: center;
-            padding: 8px;
-            background: var(--bg-light);
+            min-width: 300px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 16px 12px 40px;
+            border: 2px solid #e0e0e0;
             border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
         }
 
-        .hairdresser-stat-value {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--primary-color);
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
         }
 
-        .hairdresser-stat-label {
-            font-size: 12px;
-            color: var(--text-secondary);
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            color: #999;
         }
 
-        .overview-card {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            color: white;
-            border-radius: 12px;
+        .filter-select {
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+            min-width: 150px;
+        }
+
+        /* Comparison View */
+        .comparison-selector {
+            background: white;
+            border-radius: 16px;
             padding: 24px;
-            box-shadow: var(--shadow-md);
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
 
-        .overview-label {
+        .selector-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #333;
+        }
+
+        .selector-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .compare-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .compare-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .comparison-results {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 24px;
+        }
+
+        .comparison-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-top: 32px;
+        }
+
+        .comparison-stat-card {
+            background: #f8f9fc;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        /* Demographics Charts */
+        .demographics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .chart-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        /* Overview Cards */
+        .overview-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 16px;
+            padding: 28px 24px;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .stat-card-label {
             font-size: 14px;
             opacity: 0.9;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
         }
 
-        .overview-value {
-            font-size: 42px;
+        .stat-card-value {
+            font-size: 48px;
             font-weight: 700;
         }
     </style>
 </head>
-<body class="dashboard-page">
+<body class="dashboard-page" style="background: #e8ecf7;">
     <header class="header">
         <div class="header-content">
             <div class="header-user">
@@ -100,50 +342,142 @@
     </header>
 
     <main class="main-container">
-        <div class="page-header">
-            <h1 class="page-title">オーナーダッシュボード</h1>
-            <p class="page-subtitle">全スタッフのパフォーマンス分析</p>
+        <!-- Tab Navigation -->
+        <div class="tab-navigation">
+            <button class="tab-btn active" onclick="switchTab('overview')" data-tab="overview">
+                📊 概要
+            </button>
+            <button class="tab-btn" onclick="switchTab('staff-list')" data-tab="staff-list">
+                👥 スタッフ一覧
+            </button>
+            <button class="tab-btn" onclick="switchTab('comparison')" data-tab="comparison">
+                📊 比較分析
+            </button>
+            <button class="tab-btn" onclick="switchTab('demographics')" data-tab="demographics">
+                👤 顧客層分析
+            </button>
+            <button class="tab-btn" onclick="switchTab('highlights')" data-tab="highlights">
+                ⭐ ハイライト
+            </button>
+            <button class="tab-btn" onclick="switchTab('settings')" data-tab="settings">
+                ⚙️ 設定
+            </button>
         </div>
 
-        <!-- Overview Stats -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; margin-bottom: 32px;">
-            <div class="overview-card">
-                <div class="overview-label">総美容師数</div>
-                <div class="overview-value" id="total-hairdressers">0</div>
+        <!-- Overview Tab -->
+        <div id="tab-overview" class="tab-content active">
+            <div class="overview-stats">
+                <div class="stat-card">
+                    <div class="stat-card-label">総美容師数</div>
+                    <div class="stat-card-value" id="total-hairdressers">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-label">総レビュー数</div>
+                    <div class="stat-card-value" id="total-reviews">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-label">平均レビュー数</div>
+                    <div class="stat-card-value" id="avg-reviews">0</div>
+                </div>
             </div>
-            <div class="overview-card">
-                <div class="overview-label">総レビュー数</div>
-                <div class="overview-value" id="total-reviews">0</div>
+
+            <div class="chart-card">
+                <div class="chart-title">📊 全体の年齢層分布</div>
+                <canvas id="overall-age-chart" style="max-height: 300px;"></canvas>
             </div>
-            <div class="overview-card">
-                <div class="overview-label">平均レビュー数</div>
-                <div class="overview-value" id="avg-reviews">0</div>
+
+            <div class="chart-card" style="margin-top: 24px;">
+                <div class="chart-title">📈 スタッフ別レビュー数比較</div>
+                <canvas id="hairdresser-comparison-chart" style="max-height: 400px;"></canvas>
             </div>
         </div>
 
-        <!-- Overall Age Distribution -->
-        <section class="content-section">
-            <div class="section-header">
-                <h2 class="section-title">📊 全体の年齢層分布</h2>
+        <!-- Staff List Tab -->
+        <div id="tab-staff-list" class="tab-content">
+            <div class="search-filter-bar">
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input
+                        type="text"
+                        class="search-input"
+                        id="staff-search"
+                        placeholder="スタッフ名またはサロン名で検索..."
+                        oninput="filterStaff()"
+                    >
+                </div>
+                <select class="filter-select" id="salon-filter" onchange="filterStaff()">
+                    <option value="">すべてのサロン</option>
+                </select>
+                <select class="filter-select" id="sort-select" onchange="filterStaff()">
+                    <option value="name">名前順</option>
+                    <option value="reviews-desc">レビュー数（多い順）</option>
+                    <option value="reviews-asc">レビュー数（少ない順）</option>
+                    <option value="age-desc">平均年齢（高い順）</option>
+                    <option value="age-asc">平均年齢（低い順）</option>
+                </select>
             </div>
-            <canvas id="overall-age-chart" style="max-height: 300px;"></canvas>
-        </section>
+            <div id="staff-grid" class="staff-grid"></div>
+        </div>
 
-        <!-- Hairdresser Comparison -->
-        <section class="content-section">
-            <div class="section-header">
-                <h2 class="section-title">📈 スタッフ別レビュー数比較</h2>
+        <!-- Comparison Tab -->
+        <div id="tab-comparison" class="tab-content">
+            <div class="comparison-selector">
+                <div class="selector-title">スタッフを選択して比較（最大4人）</div>
+                <div class="selector-grid" id="comparison-selector-grid"></div>
+                <button class="compare-btn" onclick="runComparison()">比較する</button>
             </div>
-            <canvas id="hairdresser-comparison-chart" style="max-height: 400px;"></canvas>
-        </section>
+            <div id="comparison-results" style="display: none;"></div>
+        </div>
 
-        <!-- Individual Hairdresser Cards -->
-        <section class="content-section">
-            <div class="section-header">
-                <h2 class="section-title">👥 スタッフ一覧</h2>
+        <!-- Demographics Tab -->
+        <div id="tab-demographics" class="tab-content">
+            <div style="margin-bottom: 24px;">
+                <label style="font-size: 14px; font-weight: 600; margin-right: 12px;">スタッフを選択:</label>
+                <select class="filter-select" id="demographics-staff-filter" onchange="updateDemographics()">
+                    <option value="">全体</option>
+                </select>
             </div>
-            <div id="hairdresser-grid" class="hairdresser-grid"></div>
-        </section>
+            <div class="demographics-grid">
+                <div class="chart-card">
+                    <div class="chart-title">年齢層分布</div>
+                    <canvas id="demo-age-chart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-title">職業分布</div>
+                    <canvas id="demo-occupation-chart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-title">既婚/未婚分布</div>
+                    <canvas id="demo-marital-chart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-title">子供の有無</div>
+                    <canvas id="demo-children-chart"></canvas>
+                </div>
+            </div>
+            <div class="chart-card" style="margin-top: 24px;">
+                <div class="chart-title">職業 × 女性像 クロス分析</div>
+                <canvas id="demo-cross-chart"></canvas>
+            </div>
+        </div>
+
+        <!-- Highlights Tab -->
+        <div id="tab-highlights" class="tab-content">
+            <div style="background: white; border-radius: 16px; padding: 40px; text-align: center;">
+                <div style="font-size: 64px; margin-bottom: 16px;">⭐</div>
+                <h2 style="font-size: 24px; color: #333; margin-bottom: 12px;">ハイライト機能</h2>
+                <p style="color: #666;">この機能は今後実装予定です</p>
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div id="tab-settings" class="tab-content">
+            <div style="background: white; border-radius: 16px; padding: 40px; text-align: center;">
+                <div style="font-size: 64px; margin-bottom: 16px;">⚙️</div>
+                <h2 style="font-size: 24px; color: #333; margin-bottom: 12px;">設定</h2>
+                <p style="color: #666;">この機能は今後実装予定です</p>
+            </div>
+        </div>
     </main>
 
     <script src="js/owner.js"></script>
