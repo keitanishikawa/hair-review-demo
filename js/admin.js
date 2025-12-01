@@ -133,9 +133,10 @@ function loadSurveyList() {
             <div style="display: flex; gap: 12px; flex-wrap: wrap; font-size: 13px; color: #666;">
                 <span>📍 ${s.prefecture || '-'}</span>
                 <span>👤 ${s.age || '-'}歳 ${s.gender || '-'}</span>
-                <span>💼 ${s.occupation || '-'}</span>
-                <span>💍 ${s.maritalStatus || '-'}</span>
                 <span>👶 ${s.hasChildren || '-'}</span>
+                <span>💼 ${s.occupation || '-'}</span>
+                <span>👩 ${s.womanType || '-'}</span>
+                <span>💍 ${s.maritalStatus || '-'}</span>
             </div>
         </div>
     `).join('');
