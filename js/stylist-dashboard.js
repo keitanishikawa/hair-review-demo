@@ -5,6 +5,19 @@ let currentStylist = null;
 let currentChart = null;
 let currentCategory = 'style';
 
+// Helper function to get image URL from localStorage or fallback to file
+function getImageUrl(filename) {
+    const imagesData = localStorage.getItem('imagesData');
+    if (imagesData) {
+        const images = JSON.parse(imagesData);
+        if (images[filename]) {
+            return images[filename]; // Base64 data URL
+        }
+    }
+    // Fallback to file system
+    return `images/${filename}`;
+}
+
 // Initialize
 async function init() {
     checkAuth();
@@ -25,21 +38,30 @@ function checkAuth() {
 // Load CSV data
 async function loadData() {
     try {
-        // Load stylists data
-        const stylistsResponse = await fetch('data/stylists.csv');
-        const stylistsCsv = await stylistsResponse.text();
-        stylistsData = Papa.parse(stylistsCsv, {
-            header: true,
-            skipEmptyLines: true
-        }).data;
+        // Try to load from localStorage first
+        const storedStylists = localStorage.getItem('stylistsData');
+        const storedReviews = localStorage.getItem('reviewsData');
 
-        // Load reviews data
-        const reviewsResponse = await fetch('data/reviews.csv');
-        const reviewsCsv = await reviewsResponse.text();
-        reviewsData = Papa.parse(reviewsCsv, {
-            header: true,
-            skipEmptyLines: true
-        }).data;
+        if (storedStylists && storedReviews) {
+            // Load from localStorage
+            stylistsData = JSON.parse(storedStylists);
+            reviewsData = JSON.parse(storedReviews);
+        } else {
+            // Fallback to CSV files
+            const stylistsResponse = await fetch('data/stylists.csv');
+            const stylistsCsv = await stylistsResponse.text();
+            stylistsData = Papa.parse(stylistsCsv, {
+                header: true,
+                skipEmptyLines: true
+            }).data;
+
+            const reviewsResponse = await fetch('data/reviews.csv');
+            const reviewsCsv = await reviewsResponse.text();
+            reviewsData = Papa.parse(reviewsCsv, {
+                header: true,
+                skipEmptyLines: true
+            }).data;
+        }
 
         // Find current stylist
         const userEmail = localStorage.getItem('userEmail');
@@ -51,7 +73,7 @@ async function loadData() {
         }
     } catch (error) {
         console.error('Error loading data:', error);
-        alert('データの読み込みに失敗しました');
+        alert('データの読み込みに失敗しました。管理画面からデータをアップロードしてください。');
     }
 }
 
@@ -106,7 +128,7 @@ function showMyPage() {
     document.getElementById('mypageEmail').textContent = currentStylist.メールアドレス;
 
     // Set profile images
-    const imageUrl = `images/${currentStylist.アップロード画像ファイル名}`;
+    const imageUrl = getImageUrl(currentStylist.アップロード画像ファイル名);
     document.getElementById('mypageProfileImage').src = imageUrl;
 
     modal.classList.add('show');
@@ -125,7 +147,7 @@ function updateDashboard() {
 
     // Update header
     document.getElementById('stylistName').textContent = currentStylist.姓名;
-    const imageUrl = `images/${currentStylist.アップロード画像ファイル名}`;
+    const imageUrl = getImageUrl(currentStylist.アップロード画像ファイル名);
     document.getElementById('profileImage').src = imageUrl;
 
     // Update chart

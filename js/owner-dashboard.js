@@ -5,6 +5,19 @@ let stylistsData = [];
 let reviewsData = [];
 let currentCharts = {};
 
+// Helper function to get image URL from localStorage or fallback to file
+function getImageUrl(filename) {
+    const imagesData = localStorage.getItem('imagesData');
+    if (imagesData) {
+        const images = JSON.parse(imagesData);
+        if (images[filename]) {
+            return images[filename]; // Base64 data URL
+        }
+    }
+    // Fallback to file system
+    return `images/${filename}`;
+}
+
 // Check authentication before loading dashboard
 function checkAuthentication() {
     const isAuthenticated = sessionStorage.getItem('ownerAuthenticated');
@@ -75,21 +88,31 @@ async function initializeDashboard() {
 // Load CSV data
 async function loadData() {
     try {
-        // Load stylists data
-        const stylistsResponse = await fetch('data/stylists.csv');
-        const stylistsText = await stylistsResponse.text();
-        const stylistsParsed = Papa.parse(stylistsText, { header: true });
-        stylistsData = stylistsParsed.data.filter(row => row['姓名'] && row['姓名'].trim());
+        // Try to load from localStorage first
+        const storedStylists = localStorage.getItem('stylistsData');
+        const storedReviews = localStorage.getItem('reviewsData');
 
-        // Load reviews data
-        const reviewsResponse = await fetch('data/reviews.csv');
-        const reviewsText = await reviewsResponse.text();
-        const reviewsParsed = Papa.parse(reviewsText, { header: true });
-        reviewsData = reviewsParsed.data.filter(row => row['回答者番号']);
+        if (storedStylists && storedReviews) {
+            // Load from localStorage
+            stylistsData = JSON.parse(storedStylists).filter(row => row['姓名'] && row['姓名'].trim());
+            reviewsData = JSON.parse(storedReviews).filter(row => row['回答者番号']);
+        } else {
+            // Fallback to CSV files
+            const stylistsResponse = await fetch('data/stylists.csv');
+            const stylistsText = await stylistsResponse.text();
+            const stylistsParsed = Papa.parse(stylistsText, { header: true });
+            stylistsData = stylistsParsed.data.filter(row => row['姓名'] && row['姓名'].trim());
+
+            const reviewsResponse = await fetch('data/reviews.csv');
+            const reviewsText = await reviewsResponse.text();
+            const reviewsParsed = Papa.parse(reviewsText, { header: true });
+            reviewsData = reviewsParsed.data.filter(row => row['回答者番号']);
+        }
 
         console.log('Loaded:', stylistsData.length, 'stylists and', reviewsData.length, 'reviews');
     } catch (error) {
         console.error('Error loading data:', error);
+        alert('データの読み込みに失敗しました。管理画面からデータをアップロードしてください。');
         throw error;
     }
 }
@@ -421,7 +444,7 @@ function displayStaff(stylists) {
         card.className = 'staff-card';
         card.innerHTML = `
             <div class="staff-card-header">
-                <img src="images/${imageFile}" alt="${stylist['姓名']}" class="staff-avatar">
+                <img src="${getImageUrl(imageFile)}" alt="${stylist['姓名']}" class="staff-avatar">
                 <div class="staff-basic-info">
                     <h3>${stylist['姓名']} (${stylistAge}歳)</h3>
                     <p>${stylist['勤務サロン名']}</p>
@@ -497,7 +520,7 @@ function showStaffModal(stylist) {
     const ageInsights = calculateAgeInsights(stylist, stylistReviews);
 
     // Update modal content
-    document.getElementById('modalStaffImage').src = `images/${imageFile}`;
+    document.getElementById('modalStaffImage').src = getImageUrl(imageFile);
     document.getElementById('modalStaffName').textContent = `${stylist['姓名']} (${stylistAge}歳)`;
     document.getElementById('modalStaffSalon').textContent = stylist['勤務サロン名'];
     document.getElementById('modalStaffEmail').textContent = stylist['メールアドレス'];
@@ -1249,7 +1272,7 @@ function createTopPerformers() {
         div.className = 'highlight-item';
         div.innerHTML = `
             <div class="highlight-rank">${index + 1}</div>
-            <img src="images/${item.stylist['アップロード画像ファイル名']}" class="highlight-avatar">
+            <img src="${getImageUrl(item.stylist['アップロード画像ファイル名'])}" class="highlight-avatar">
             <div class="highlight-info">
                 <strong>${item.stylist['姓名']}</strong>
                 <small>${item.stylist['勤務サロン名']}</small>
@@ -1367,7 +1390,7 @@ function displayHighlightList(containerId, items) {
         div.className = 'highlight-item';
         div.innerHTML = `
             <div class="highlight-rank">${index + 1}</div>
-            <img src="images/${item.stylist['アップロード画像ファイル名']}" class="highlight-avatar">
+            <img src="${getImageUrl(item.stylist['アップロード画像ファイル名'])}" class="highlight-avatar">
             <div class="highlight-info">
                 <strong>${item.stylist['姓名']}</strong>
                 <small>${item.stylist['勤務サロン名']}</small>
@@ -1384,14 +1407,21 @@ function displayHighlightList(containerId, items) {
 
 // Handle password change
 function handlePasswordChange() {
-    // Step 1: Verify "secret phrase" (takara1234)
+    // Step 1: Verify "secret phrase" from localStorage
+    const storedSecretPhrase = localStorage.getItem('secretPhrase');
+
+    if (!storedSecretPhrase) {
+        alert('合言葉が設定されていません。管理画面（admin-dashboard.html）から合言葉を設定してください。');
+        return;
+    }
+
     const secretPhrase = prompt('パスワードを変更するには「合言葉」を入力してください:');
 
     if (secretPhrase === null) {
         return; // User cancelled
     }
 
-    if (secretPhrase !== 'takara1234') {
+    if (secretPhrase !== storedSecretPhrase) {
         alert('合言葉が正しくありません。パスワード変更できませんでした。');
         return;
     }

@@ -9,20 +9,29 @@ const errorMessage = document.getElementById('errorMessage');
 // Email validation regex
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// Load valid accounts from CSV
+// Load valid accounts from localStorage
 async function loadValidAccounts() {
     try {
-        const response = await fetch('data/stylists.csv');
-        const csv = await response.text();
-        const parsed = Papa.parse(csv, {
-            header: true,
-            skipEmptyLines: true
-        });
+        // Try to load from localStorage first
+        const stylistsData = localStorage.getItem('stylistsData');
 
-        VALID_ACCOUNTS = parsed.data.map(stylist => stylist.メールアドレス.toLowerCase());
+        if (stylistsData) {
+            const parsed = JSON.parse(stylistsData);
+            VALID_ACCOUNTS = parsed.map(stylist => stylist.メールアドレス.toLowerCase());
+        } else {
+            // Fallback to CSV file if localStorage is empty
+            const response = await fetch('data/stylists.csv');
+            const csv = await response.text();
+            const parsed = Papa.parse(csv, {
+                header: true,
+                skipEmptyLines: true
+            });
+
+            VALID_ACCOUNTS = parsed.data.map(stylist => stylist.メールアドレス.toLowerCase());
+        }
     } catch (error) {
         console.error('Error loading stylists:', error);
-        showError('データの読み込みに失敗しました。ページを再読み込みしてください。');
+        showError('データの読み込みに失敗しました。管理画面からデータをアップロードしてください。');
     }
 }
 
@@ -132,12 +141,13 @@ function checkExistingLogin() {
 
 // Handle owner login with password
 function handleOwnerLogin() {
-    // Get current owner password from localStorage (default: lebel1234)
-    const ownerPassword = localStorage.getItem('ownerPassword') || 'lebel1234';
+    // Get current owner password from localStorage
+    const ownerPassword = localStorage.getItem('ownerPassword');
 
-    // Initialize default password if not set
-    if (!localStorage.getItem('ownerPassword')) {
-        localStorage.setItem('ownerPassword', 'lebel1234');
+    // Check if password is set
+    if (!ownerPassword) {
+        alert('オーナーパスワードが設定されていません。管理画面（admin-dashboard.html）からパスワードを設定してください。');
+        return;
     }
 
     // Prompt for password

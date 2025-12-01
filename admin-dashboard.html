@@ -3,116 +3,435 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hair Design Review - Dashboard</title>
+    <title>Hair Design Review - 管理画面</title>
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/admin-dashboard.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .admin-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+        }
+
+        .admin-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .admin-header h1 {
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .admin-header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            padding: 30px;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            background: #f9f9f9;
+        }
+
+        .section h2 {
+            font-size: 1.8em;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-icon {
+            font-size: 1.2em;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.05em;
+        }
+
+        .form-group input[type="file"],
+        .form-group input[type="password"],
+        .form-group input[type="text"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.05em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.4);
+        }
+
+        .status-message {
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            font-weight: 500;
+            display: none;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+
+        .info-box p {
+            margin: 5px 0;
+            color: #0c5460;
+        }
+
+        .data-status {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .status-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .status-card .number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .status-card .label {
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .file-info {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
 </head>
-<body class="dashboard-page">
-    <!-- Header -->
-    <header class="dashboard-header">
-        <div class="header-content">
-            <div class="logo-section">
-                <span class="logo-icon">✨</span>
-                <h1>Hair Design Review</h1>
-            </div>
-            <div class="user-section">
-                <span class="user-email" id="userEmail"></span>
-                <button id="logoutBtn" class="btn-logout">ログアウト</button>
-            </div>
+<body>
+    <div class="admin-container">
+        <div class="admin-header">
+            <h1>🎨 Hair Design Review 管理画面</h1>
+            <p>CSV、画像、設定を管理してシステムをセットアップします</p>
         </div>
-    </header>
 
-    <!-- Main Content -->
-    <main class="dashboard-main">
-        <div class="container">
-            <!-- Stats Section -->
-            <section class="stats-section">
-                <h2 class="section-title">📊 統計</h2>
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon">🎨</div>
-                        <div class="stat-value" id="totalDesigns">10</div>
-                        <div class="stat-label">デザイン総数</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">⭐</div>
-                        <div class="stat-value" id="avgRating">4.5</div>
-                        <div class="stat-label">平均評価</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">💬</div>
-                        <div class="stat-value" id="totalReviews">28</div>
-                        <div class="stat-label">レビュー総数</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">👁️</div>
-                        <div class="stat-value" id="totalViews">156</div>
-                        <div class="stat-label">閲覧数</div>
-                    </div>
+        <!-- データステータス -->
+        <section class="section">
+            <h2><span class="section-icon">📊</span>現在のデータ状況</h2>
+            <div class="data-status" id="dataStatus">
+                <div class="status-card">
+                    <div class="number" id="stylistCount">0</div>
+                    <div class="label">スタイリスト</div>
                 </div>
-            </section>
-
-            <!-- Gallery Section -->
-            <section class="gallery-section">
-                <h2 class="section-title">🖼️ ヘアデザインギャラリー</h2>
-                <div class="filter-buttons">
-                    <button class="filter-btn active" data-filter="all">すべて</button>
-                    <button class="filter-btn" data-filter="short">ショート</button>
-                    <button class="filter-btn" data-filter="medium">ミディアム</button>
-                    <button class="filter-btn" data-filter="long">ロング</button>
+                <div class="status-card">
+                    <div class="number" id="reviewCount">0</div>
+                    <div class="label">レビュー</div>
                 </div>
-                <div class="gallery-grid" id="galleryGrid">
-                    <!-- Gallery items will be dynamically loaded -->
-                </div>
-            </section>
-        </div>
-    </main>
-
-    <!-- Modal for Design Details -->
-    <div class="modal" id="designModal">
-        <div class="modal-content">
-            <button class="modal-close" id="modalClose">&times;</button>
-            <div class="modal-body">
-                <div class="modal-image">
-                    <img id="modalImage" src="" alt="Hair Design">
-                </div>
-                <div class="modal-info">
-                    <h3 id="modalTitle"></h3>
-                    <div class="rating-display">
-                        <div class="stars" id="modalStars"></div>
-                        <span class="rating-value" id="modalRatingValue"></span>
-                    </div>
-
-                    <!-- Add Review Section -->
-                    <div class="add-review">
-                        <h4>レビューを投稿</h4>
-                        <div class="rating-input">
-                            <span class="star-input" data-rating="1">☆</span>
-                            <span class="star-input" data-rating="2">☆</span>
-                            <span class="star-input" data-rating="3">☆</span>
-                            <span class="star-input" data-rating="4">☆</span>
-                            <span class="star-input" data-rating="5">☆</span>
-                        </div>
-                        <textarea
-                            id="reviewComment"
-                            placeholder="コメントを入力してください..."
-                            rows="3"
-                        ></textarea>
-                        <button id="submitReview" class="btn-primary">レビューを投稿</button>
-                    </div>
-
-                    <!-- Reviews List -->
-                    <div class="reviews-list">
-                        <h4>レビュー</h4>
-                        <div id="reviewsContainer">
-                            <!-- Reviews will be dynamically loaded -->
-                        </div>
-                    </div>
+                <div class="status-card">
+                    <div class="number" id="imageCount">0</div>
+                    <div class="label">画像</div>
                 </div>
             </div>
-        </div>
+        </section>
+
+        <!-- CSVアップロード -->
+        <section class="section">
+            <h2><span class="section-icon">📄</span>CSVファイルのアップロード</h2>
+
+            <div class="form-group">
+                <label for="stylistsCsv">スタイリストCSV（stylists.csv）</label>
+                <input type="file" id="stylistsCsv" accept=".csv">
+                <div class="file-info">フォーマット: 姓名,セイメイ,勤務サロン名,メールアドレス,アップロード画像ファイル名,年齢</div>
+            </div>
+
+            <div class="form-group">
+                <label for="reviewsCsv">レビューCSV（reviews.csv）</label>
+                <input type="file" id="reviewsCsv" accept=".csv">
+                <div class="file-info">フォーマット: 回答者番号,選択した画像ファイル,コメント,職業,年齢,性別,既婚未婚,子供の有無,女性像...</div>
+            </div>
+
+            <button class="btn btn-primary" onclick="uploadCSVs()">CSVをアップロード</button>
+            <div class="status-message" id="csvStatus"></div>
+        </section>
+
+        <!-- 画像アップロード -->
+        <section class="section">
+            <h2><span class="section-icon">🖼️</span>画像のアップロード</h2>
+
+            <div class="form-group">
+                <label for="imagesZip">画像ZIPファイル</label>
+                <input type="file" id="imagesZip" accept=".zip">
+                <div class="file-info">hair_design_001.jpg ～ hair_design_020.jpg などの画像を含むZIPファイル</div>
+            </div>
+
+            <button class="btn btn-primary" onclick="uploadImages()">画像をアップロード</button>
+            <div class="status-message" id="imageStatus"></div>
+
+            <div class="info-box">
+                <p><strong>注意:</strong> ZIPファイルは JSZip ライブラリを使用して解凍されます。</p>
+                <p>画像は Base64 形式で localStorage に保存されます。</p>
+            </div>
+        </section>
+
+        <!-- パスワード設定 -->
+        <section class="section">
+            <h2><span class="section-icon">🔐</span>パスワード設定</h2>
+
+            <div class="form-group">
+                <label for="ownerPassword">オーナーパスワード</label>
+                <input type="password" id="ownerPassword" placeholder="オーナーログイン用のパスワード">
+            </div>
+
+            <div class="form-group">
+                <label for="secretPhrase">合言葉（パスワード変更時に必要）</label>
+                <input type="text" id="secretPhrase" placeholder="パスワード変更用の合言葉">
+            </div>
+
+            <button class="btn btn-primary" onclick="savePasswords()">パスワードを保存</button>
+            <div class="status-message" id="passwordStatus"></div>
+        </section>
+
+        <!-- データリセット -->
+        <section class="section">
+            <h2><span class="section-icon">⚠️</span>データリセット</h2>
+            <p style="color: #666; margin-bottom: 20px;">すべてのデータを削除して初期状態に戻します。</p>
+
+            <button class="btn btn-danger" onclick="resetAllData()">すべてのデータをリセット</button>
+            <div class="status-message" id="resetStatus"></div>
+        </section>
     </div>
 
-    <script src="js/admin-dashboard.js"></script>
+    <!-- JSZip ライブラリ -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <!-- PapaParse ライブラリ -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+
+    <script>
+        // ページ読み込み時にデータ状況を表示
+        window.addEventListener('DOMContentLoaded', () => {
+            updateDataStatus();
+        });
+
+        // データ状況の更新
+        function updateDataStatus() {
+            const stylists = JSON.parse(localStorage.getItem('stylistsData') || '[]');
+            const reviews = JSON.parse(localStorage.getItem('reviewsData') || '[]');
+            const images = JSON.parse(localStorage.getItem('imagesData') || '{}');
+
+            document.getElementById('stylistCount').textContent = stylists.length;
+            document.getElementById('reviewCount').textContent = reviews.length;
+            document.getElementById('imageCount').textContent = Object.keys(images).length;
+        }
+
+        // CSVアップロード
+        async function uploadCSVs() {
+            const stylistsFile = document.getElementById('stylistsCsv').files[0];
+            const reviewsFile = document.getElementById('reviewsCsv').files[0];
+            const statusEl = document.getElementById('csvStatus');
+
+            if (!stylistsFile && !reviewsFile) {
+                showStatus(statusEl, 'error', '少なくとも1つのCSVファイルを選択してください。');
+                return;
+            }
+
+            try {
+                if (stylistsFile) {
+                    const stylistsText = await stylistsFile.text();
+                    const parsed = Papa.parse(stylistsText, { header: true, skipEmptyLines: true });
+                    localStorage.setItem('stylistsData', JSON.stringify(parsed.data));
+                }
+
+                if (reviewsFile) {
+                    const reviewsText = await reviewsFile.text();
+                    const parsed = Papa.parse(reviewsText, { header: true, skipEmptyLines: true });
+                    localStorage.setItem('reviewsData', JSON.stringify(parsed.data));
+                }
+
+                showStatus(statusEl, 'success', 'CSVファイルが正常にアップロードされました！');
+                updateDataStatus();
+            } catch (error) {
+                showStatus(statusEl, 'error', 'エラー: ' + error.message);
+            }
+        }
+
+        // 画像アップロード
+        async function uploadImages() {
+            const zipFile = document.getElementById('imagesZip').files[0];
+            const statusEl = document.getElementById('imageStatus');
+
+            if (!zipFile) {
+                showStatus(statusEl, 'error', 'ZIPファイルを選択してください。');
+                return;
+            }
+
+            try {
+                const zip = new JSZip();
+                const zipData = await zip.loadAsync(zipFile);
+                const images = {};
+                let imageCount = 0;
+
+                for (const [filename, file] of Object.entries(zipData.files)) {
+                    if (!file.dir && /\.(jpg|jpeg|png|gif)$/i.test(filename)) {
+                        const blob = await file.async('blob');
+                        const base64 = await blobToBase64(blob);
+                        const cleanFilename = filename.split('/').pop(); // フォルダ名を除去
+                        images[cleanFilename] = base64;
+                        imageCount++;
+                    }
+                }
+
+                localStorage.setItem('imagesData', JSON.stringify(images));
+                showStatus(statusEl, 'success', `${imageCount}枚の画像が正常にアップロードされました！`);
+                updateDataStatus();
+            } catch (error) {
+                showStatus(statusEl, 'error', 'エラー: ' + error.message);
+            }
+        }
+
+        // Blobを Base64 に変換
+        function blobToBase64(blob) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(blob);
+            });
+        }
+
+        // パスワード保存
+        function savePasswords() {
+            const ownerPassword = document.getElementById('ownerPassword').value;
+            const secretPhrase = document.getElementById('secretPhrase').value;
+            const statusEl = document.getElementById('passwordStatus');
+
+            if (!ownerPassword || !secretPhrase) {
+                showStatus(statusEl, 'error', 'すべてのフィールドを入力してください。');
+                return;
+            }
+
+            localStorage.setItem('ownerPassword', ownerPassword);
+            localStorage.setItem('secretPhrase', secretPhrase);
+
+            showStatus(statusEl, 'success', 'パスワードと合言葉が保存されました！');
+
+            // 入力フィールドをクリア
+            document.getElementById('ownerPassword').value = '';
+            document.getElementById('secretPhrase').value = '';
+        }
+
+        // データリセット
+        function resetAllData() {
+            if (!confirm('本当にすべてのデータを削除しますか？この操作は取り消せません。')) {
+                return;
+            }
+
+            const statusEl = document.getElementById('resetStatus');
+
+            try {
+                localStorage.removeItem('stylistsData');
+                localStorage.removeItem('reviewsData');
+                localStorage.removeItem('imagesData');
+                localStorage.removeItem('ownerPassword');
+                localStorage.removeItem('secretPhrase');
+                localStorage.removeItem('userEmail');
+                localStorage.removeItem('loginTime');
+                localStorage.removeItem('ownerAuthenticated');
+
+                showStatus(statusEl, 'success', 'すべてのデータがリセットされました。');
+                updateDataStatus();
+            } catch (error) {
+                showStatus(statusEl, 'error', 'エラー: ' + error.message);
+            }
+        }
+
+        // ステータスメッセージ表示
+        function showStatus(element, type, message) {
+            element.textContent = message;
+            element.className = 'status-message status-' + type;
+            element.style.display = 'block';
+
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 5000);
+        }
+    </script>
 </body>
 </html>
