@@ -131,7 +131,6 @@ function loadSurveyList() {
                 <span style="font-size: 12px; color: #999;">#${i + 1}</span>
             </div>
             <div style="display: flex; gap: 12px; flex-wrap: wrap; font-size: 13px; color: #666;">
-                <span>📍 ${s.prefecture || '-'}</span>
                 <span>👤 ${s.age || '-'}歳 ${s.gender || '-'}</span>
                 <span>👶 ${s.hasChildren || '-'}</span>
                 <span>💼 ${s.occupation || '-'}</span>
@@ -255,11 +254,11 @@ function handleSurveyCSV(file) {
                     .filter(row => row.画像ファイル名 || row.imageFile)
                     .map(row => ({
                         age: row.年齢 || row.age || '',
-                        prefecture: row.都道府県 || row.prefecture || '',
                         gender: row.性別 || row.gender || '',
                         maritalStatus: row.結婚 || row.marital_status || row.結婚状態 || '',
                         occupation: row.職業 || row.occupation || '',
                         hasChildren: row.子供有無 || row.has_children || row.子供の有無 || '',
+                        womanType: row.女性像 || row.womanType || row.woman_type || '',
                         imageFile: row.画像ファイル名 || row.imageFile || row.選択した画像ファイル || ''
                     }));
 
@@ -503,7 +502,6 @@ function displaySurveyPreview(results) {
     // Define expected fields with aliases
     const expectedFields = [
         { name: '年齢', aliases: ['年齢', 'age', 'ねんれい', 'エイジ', '歳'] },
-        { name: '都道府県', aliases: ['都道府県', '県', 'prefecture', '住所', '地域', '都道府', 'エリア'] },
         { name: '性別', aliases: ['性別', 'gender', 'sex', '男女', '性'] },
         { name: '結婚', aliases: ['結婚', '婚姻', 'marital_status', 'marital', '既婚', '未婚', '結婚状態'] },
         { name: '子供有無', aliases: ['子供有無', '子供', 'has_children', 'children', '子ども', 'こども', '子供の有無'] },
@@ -545,7 +543,7 @@ function displaySurveyPreview(results) {
     mappingHtml += '<button onclick="applySurveyMapping()" style="margin-top: 12px; padding: 8px 16px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">✓ マッピングを適用してプレビュー更新</button>';
     mappingHtml += '</div>';
 
-    const headers_display = ['年齢', '都道府県', '性別', '結婚', '子供有無', '職業', '女性像', '画像ファイル名'];
+    const headers_display = ['年齢', '性別', '結婚', '子供有無', '職業', '女性像', '画像ファイル名'];
 
     let html = mappingHtml;
     html += '<table style="width: 100%; border-collapse: collapse; background: white; font-size: 13px;">';
@@ -559,7 +557,6 @@ function displaySurveyPreview(results) {
         const bgColor = i % 2 === 0 ? '#f8f9fa' : '#ffffff';
         html += `<tr style="background: ${bgColor};">`;
         html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${row[surveyColumnMapping['年齢']] || findColumn(row, ['年齢', 'age', 'ねんれい']) || '-'}</td>`;
-        html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${row[surveyColumnMapping['都道府県']] || findColumn(row, ['都道府県', '県', 'prefecture', '住所', '地域']) || '-'}</td>`;
         html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${row[surveyColumnMapping['性別']] || findColumn(row, ['性別', 'gender', 'sex', '男女']) || '-'}</td>`;
         html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${row[surveyColumnMapping['結婚']] || findColumn(row, ['結婚', '婚姻', 'marital_status', 'marital', '結婚状態']) || '-'}</td>`;
         html += `<td style="padding: 10px; border-bottom: 1px solid #e0e0e0;">${row[surveyColumnMapping['子供有無']] || findColumn(row, ['子供有無', '子供', 'has_children', 'children', '子ども']) || '-'}</td>`;
@@ -600,7 +597,6 @@ function processSurveyData(results) {
         .filter(row => row[surveyColumnMapping['画像ファイル名']] || findColumn(row, ['画像ファイル名', '画像', 'image_file', 'imageFile', 'ファイル名']))
         .map(row => ({
             age: row[surveyColumnMapping['年齢']] || findColumn(row, ['年齢', 'age', 'ねんれい']),
-            prefecture: row[surveyColumnMapping['都道府県']] || findColumn(row, ['都道府県', '県', 'prefecture', '住所', '地域']),
             gender: row[surveyColumnMapping['性別']] || findColumn(row, ['性別', 'gender', 'sex', '男女']),
             maritalStatus: row[surveyColumnMapping['結婚']] || findColumn(row, ['結婚', '婚姻', 'marital_status', 'marital', '結婚状態']),
             hasChildren: row[surveyColumnMapping['子供有無']] || findColumn(row, ['子供有無', '子供', 'has_children', 'children', '子ども', '子供の有無']),

@@ -226,7 +226,7 @@ function displayReviews() {
         <div class="review-card">
             <div class="review-meta">
                 #${i + 1} | ${review.age}歳 ${review.gender || ''} | ${review.occupation || ''} |
-                ${review.maritalStatus || ''} | ${review.hasChildren || ''} | ${review.prefecture || ''}
+                ${review.maritalStatus || ''} | ${review.hasChildren || ''}
             </div>
         </div>
     `).join('');
